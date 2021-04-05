@@ -1,3 +1,7 @@
+1.3.0
+- Changed: Initial port to python3 and matrix
+- TODO: Settings is broken in the UI - fix translations
+
 1.2.0
 - Changed : Optimise song selection
 - Added : 2 properties (minimalmatch, minimalplaycount)

@@ -311,6 +311,7 @@ class MyPlayer( xbmc.Player ) :
             fanart = "special://profile/Thumbnails/Music/%s/%s" % ( "Fanart", cache_name, )
         listitem.setProperty('fanart_image',fanart)
         listitem.setInfo('music', { 'title': trackTitle, 'artist': artist, 'album': album, 'duration': duration })
+        listitem.setArt({ 'thumb' : thumb, 'fanart' : fanart})
         #listitem.setThumbnailImage(thumb)
         log("[LFM PLG(PM)] Fanart:%s" % fanart)
         return listitem

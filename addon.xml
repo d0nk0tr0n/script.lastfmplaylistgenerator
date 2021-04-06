@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
 <addon id="script.lastfmplaylistgeneratorPM"
        name="Last.FM Playlist Generator (Partymode)"
-       version="1.3.0"
+       version="1.3.0.1"
        provider-name="d0nk0tr0n">
   <requires>
     <import addon="script.module.simplejson"/>

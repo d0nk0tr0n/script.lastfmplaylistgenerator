@@ -91,7 +91,12 @@ class MyPlayer( xbmc.Player ) :
                 album = xbmc.Player().getMusicInfoTag().getAlbum()
                 cache_name = xbmc.getCacheThumbName(os.path.dirname(xbmc.Player().getMusicInfoTag().getURL()))
                 log("[LFM PLG(PM)] Playing file: %s" % xbmc.Player().getMusicInfoTag().getURL())
-                thumb = "special://profile/Thumbnails/Music/%s/%s" % ( cache_name[:1], cache_name, )
+
+                #log("[LFM PLG(PM)] cache_name: %s" % cache_name)
+                #thumb = "special://profile/Thumbnails/Music/%s/%s" % ( cache_name[:1], cache_name, )
+                #thumb = "special://profile/thumbnails/Music/%s/%s" % ( cache_name[:1], cache_name, )
+                #log("THUMB IS: " + thumb)
+
                 duration = xbmc.Player().getMusicInfoTag().getDuration()
                 fanart = ""
                 log("PRE-listitem in main_similarTracks")
@@ -289,7 +294,7 @@ class MyPlayer( xbmc.Player ) :
         listitem = xbmcgui.ListItem(trackTitle)
         if (fanart == ""):
             cache_name = xbmc.getCacheThumbName( str(artist) )
-            fanart = "special://profile/Thumbnails/Music/%s/%s" % ( "Fanart", cache_name, )
+            fanart = "special://profile/thumbnails/Music/%s/%s" % ( "Fanart", cache_name, )
         listitem.setProperty('fanart_image',fanart)
         listitem.setInfo('music', { 'title': trackTitle, 'artist': artist, 'album': album, 'duration': duration })
         listitem.setArt({ 'thumb' : thumb, 'fanart' : fanart})

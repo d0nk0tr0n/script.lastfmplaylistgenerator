@@ -3,13 +3,9 @@
     Created by: ErlendSB
     Ported to python3 by d0nk0tr0n
 """
-#TODO fix the utf encode/decode stuff - script is mostly ported
-#TODO fix the strings translation files
-
 import os
 import random
 import difflib
-#import http.client, urllib.request, urllib.parse, urllib.error, urllib.request, urllib.error, urllib.parse
 import sys, time
 import threading
 import unicodedata
@@ -17,21 +13,22 @@ import urllib.request
 import re
 from os.path import exists
 from os import remove
-#if sys.version_info < (2, 7):
-    #import simplejson
-#else:
 import json as simplejson
 from urllib.parse import quote
-import xbmc, xbmcgui, xbmcaddon
+import xbmc, xbmcgui, xbmcaddon, xbmcvfs
+
+# TODO before 20: xbmc.translatePath is deprecated and might be removed in future kodi versions. Please use xbmcvfs.translatePath instead.
 
 __settings__ = xbmcaddon.Addon(id='script.lastfmplaylistgeneratorPM')
 __addonversion__ = __settings__.getAddonInfo('version')
 __cwd__          = __settings__.getAddonInfo('path')
 
 def log(txt):
-    #message = u'%s: %s' % ("LPM", txt)
     message = '%s: %s' % ("LPM", txt)
+    # LOGWARNING if you're developing and don't want too much chatter from running kodi in debug
     xbmc.log(msg=message, level=xbmc.LOGWARNING)
+    # for release switch to DEBUG:
+    #xbmc.log(msg=message, level=xbmc.LOGDEBUG)
 class MyPlayer( xbmc.Player ) :
     countFoundTracks = 0
     addedTracks = []
@@ -57,12 +54,14 @@ class MyPlayer( xbmc.Player ) :
     
     def __init__ ( self ):
         log("__init__ started")
-        if not os.path.exists(xbmc.translatePath("special://userdata/advancedsettings.xml")):
+        #if not os.path.exists(xbmc.translatePath("special://userdata/advancedsettings.xml")):
+        if not os.path.exists(xbmcvfs.translatePath("special://userdata/advancedsettings.xml")):
             self.dbtype = 'sqlite3'
         else:
             from xml.etree.ElementTree import ElementTree
             advancedsettings = ElementTree()
-            advancedsettings.parse(xbmc.translatePath("special://userdata/advancedsettings.xml"))
+            #advancedsettings.parse(xbmc.translatePath("special://userdata/advancedsettings.xml"))
+            advancedsettings.parse(xbmcvfs.translatePath("special://userdata/advancedsettings.xml"))
             settings = advancedsettings.getroot().find("musicdatabase")
             if settings is not None:
                 for setting in settings:
@@ -81,19 +80,16 @@ class MyPlayer( xbmc.Player ) :
         log("__init__ completed")
     
     def startPlayBack(self):
-        #print("[LFM PLG(PM)] startPlayBack started")
         log("[LFM PLG(PM)] startPlayBack started")
         if xbmc.Player().isPlayingAudio() == True:
             currentlyPlayingTitle = xbmc.Player().getMusicInfoTag().getTitle()
             currentlyPlayingArtist = xbmc.Player().getMusicInfoTag().getArtist()
-            #print("[LFM PLG(PM)] " + currentlyPlayingArtist + " - " + currentlyPlayingTitle + " started playing")
             log("[LFM PLG(PM)] " + currentlyPlayingArtist + " - " + currentlyPlayingTitle + " started playing")
             self.countFoundTracks = 0
             if (self.firstRun == 1):
                 self.firstRun = 0
                 album = xbmc.Player().getMusicInfoTag().getAlbum()
                 cache_name = xbmc.getCacheThumbName(os.path.dirname(xbmc.Player().getMusicInfoTag().getURL()))
-                #print("[LFM PLG(PM)] Playing file: %s" % xbmc.Player().getMusicInfoTag().getURL())
                 log("[LFM PLG(PM)] Playing file: %s" % xbmc.Player().getMusicInfoTag().getURL())
                 thumb = "special://profile/Thumbnails/Music/%s/%s" % ( cache_name[:1], cache_name, )
                 duration = xbmc.Player().getMusicInfoTag().getDuration()
@@ -110,7 +106,6 @@ class MyPlayer( xbmc.Player ) :
 
     def onPlayBackStarted(self):
         log("[LFM PLG(PM)] onPlayBackStarted waiting:  " + str(self.delaybeforesearching) +" seconds")
-        #print("[LFM PLG(PM)] onPlayBackStarted waiting:  " + str(self.delaybeforesearching) +" seconds")
         if (self.timer is not None and self.timer.isAlive()):
             self.timer.cancel()
             
@@ -119,6 +114,7 @@ class MyPlayer( xbmc.Player ) :
     
     def unicode_normalize_string(self, text):
         log("unicode_normalize_string is: " + text)
+        # old python 2 for posterity
         #return unicodedata.normalize('NFD', str(text, 'utf-8')).encode('ascii', 'ignore').upper().replace("-","")   
         return unicodedata.normalize(text).encode('ascii', 'ignore').upper().replace("-","")   
     
@@ -130,10 +126,8 @@ class MyPlayer( xbmc.Player ) :
         #Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(self.unicode_normalize_string(currentlyPlayingArtist)) + "&track=" + urllib.parse.quote_plus(self.unicode_normalize_string(currentlyPlayingTitle))
         Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist) + "&track=" + urllib.parse.quote_plus(currentlyPlayingTitle)
         WebSock = urllib.request.urlopen(Base_URL)  # Opens a 'Socket' to URL
-        #print("[LFM PLG(PM)] Request : " + Base_URL)
-        log("[LFM PLG(PM)] Request : " + Base_URL)
-        #WebHTML = WebSock.read()           # Reads Contents of URL and saves to Variable
-        WebHTML = WebSock.read().decode('utf-8')            # Reads Contents of URL and saves to Variable
+        log("[LFM PLG(PM)] Request Base_URL: " + Base_URL)
+        WebHTML = WebSock.read().decode('utf-8') # decode as utf-8 and we don't have to convert
         WebSock.close()                     # Closes connection to url
         
         searchTracks = re.findall("<track>.*?<name>(.+?)</name>.*?<artist>(.+?)</artist>.*?<listeners>(.+?)</listeners>.*?</track>", WebHTML, re.DOTALL )       
@@ -147,7 +141,6 @@ class MyPlayer( xbmc.Player ) :
 
                 if(fullRatio > 0.5):
                     foundTracks.append([foundTrackName, foundArtistName])
-                    #print("[LFM PLG(PM)] Found Similar Track Name : " + foundTrackName + " by: " + foundArtistName)
                     log("[LFM PLG(PM)] Found Similar Track Name : " + foundTrackName + " by: " + foundArtistName)
         
         log("main foundTracks is " + foundTracks)
@@ -160,10 +153,8 @@ class MyPlayer( xbmc.Player ) :
         #Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(self.unicode_normalize_string(currentlyPlayingArtist))
         Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist)
         WebSock = urllib.request.urlopen(Base_URL)  # Opens a 'Socket' to URL
-        #print("[LFM PLG(PM)] Request : " + Base_URL)        
         log("[LFM PLG(PM)] Request : " + Base_URL)        
-        #WebHTML = WebSock.read()            # Reads Contents of URL and saves to Variable
-        WebHTML = WebSock.read().decode('utf-8')            # Reads Contents of URL and saves to Variable
+        WebHTML = WebSock.read().decode('utf-8')    # decode as utf-8 so we don't play games converting
         WebSock.close()                     # Closes connection to url
     
         similarArtists = re.findall("<artist>.*?<name>(.+?)</name>.*?<mbid>(.+?)</mbid>.*?<match>(.+?)</match>.*?</artist>", WebHTML, re.DOTALL )
@@ -172,7 +163,6 @@ class MyPlayer( xbmc.Player ) :
     
     def find_Artist(self, artistName):
         json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetArtists", "params": { "filter": {"field":"artist","operator":"is","value":"%s"} }, "id": 1}' % (artistName)) 
-        #json_query = str(json_query, 'utf-8', errors='ignore')
         json_response = simplejson.loads(json_query)
         if 'result' in json_response and json_response['result'] != None and 'artists' in json_response['result'] :
             return True
@@ -184,13 +174,10 @@ class MyPlayer( xbmc.Player ) :
         # The url in which to use
         Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(mbIdArtist)
         WebSock = urllib.request.urlopen(Base_URL)  # Opens a 'Socket' to URL
-        #print("[LFM PLG(PM)] Request : " + Base_URL)        
         log("[LFM PLG(PM)] Request : " + Base_URL)        
-        #WebHTML2 = WebSock.read()            # Reads Contents of URL and saves to Variable
-        WebHTML2 = WebSock.read().decode('utf-8') # Reads Contents of URL and saves to Variable
+        WebHTML2 = WebSock.read().decode('utf-8') # decode('utf-8') again
         WebSock.close()                     # Closes connection to url
         topTracks = re.findall("<track rank=.+?>.*?<name>(.+?)</name>.*?<playcount>(.+?)</playcount>.*?<listeners>(.+?)</listeners>.*?<artist>.*?<name>(.+?)</name>.*?</artist>.*?</track>", WebHTML2, re.DOTALL )
-        #print("[LFM PLG(PM)] Count: " + str(len(topTracks)))
         log("[LFM PLG(PM)] Count: " + str(len(topTracks)))
         topTracks = [x for x in topTracks if int(x[1]) > self.minimalplaycount]     
         return topTracks    
@@ -202,10 +189,8 @@ class MyPlayer( xbmc.Player ) :
         #Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(self.unicode_normalize_string(currentlyPlayingArtist)) + "&track=" + urllib.parse.quote_plus(self.unicode_normalize_string(currentlyPlayingTitle))
         Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist) + "&track=" + urllib.parse.quote_plus(currentlyPlayingTitle)
         WebSock = urllib.request.urlopen(Base_URL)  # Opens a 'Socket' to URL
-        #print("[LFM PLG(PM)] Request : " + Base_URL)        
         log("[LFM PLG(PM)] Request : " + Base_URL)        
-        #WebHTML = WebSock.read()            # Reads Contents of URL and saves to Variable
-        WebHTML = WebSock.read().decode('utf-8')     # Reads Contents of URL and saves to Variable
+        WebHTML = WebSock.read().decode('utf-8')     # utf-8
         WebSock.close()                     # Closes connection to url
 
         similarTracks = re.findall("<track>.*?<name>(.+?)</name>.*?<playcount>(.+?)</playcount>.*?<match>(.+?)</match>.*?<artist>.*?<name>(.+?)</name>.*?</artist>.*?</track>", WebHTML, re.DOTALL )
@@ -221,7 +206,6 @@ class MyPlayer( xbmc.Player ) :
             countTracks = len(similarTracks)            
         if(self.mode == "Top tracks of similar artist" or (self.mode == "Custom" and countTracks < 10)):
             similarArtists = self.fetch_similarArtists(currentlyPlayingArtist)
-            #print("[LFM PLG(PM)] Nb Similar Artists : " + str(len(similarArtists)))
             log("[LFM PLG(PM)] Nb Similar Artists : " + str(len(similarArtists)))
             for similarArtistName, mbid, matchValue in similarArtists:
                 if self.find_Artist(similarArtistName):
@@ -229,8 +213,9 @@ class MyPlayer( xbmc.Player ) :
                 
         foundArtists = []
         countTracks = len(similarTracks)
-        #print("[LFM PLG(PM)] Count: " + str(countTracks))
         log("[LFM PLG(PM)] Count: " + str(countTracks))
+
+        # Ancient code from the crypts.
         #if(countTracks < 10):
         #   print "[LFM PLG(PM)] Find Similar Track Name"
         #   listSearchResult = []
@@ -249,11 +234,9 @@ class MyPlayer( xbmc.Player ) :
             similarArtistName = similarArtistName.replace("+"," ").replace("("," ").replace(")"," ").replace("&quot","''").replace("&amp;","and")
             log("Looking for: " + similarTrackName + " - " + similarArtistName + " - " + matchValue + "/" + playCount)          
             json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetSongs", "params": { "properties": ["title", "artist", "album", "file", "thumbnail", "duration", "fanart"], "limits": {"end":1}, "sort": {"method":"random"}, "filter": { "and":[{"field":"title","operator":"is","value":"%s"},{"field":"artist","operator":"is","value":"%s"}] } }, "id": 1}' % (similarTrackName, similarArtistName)) 
-            #json_query = str(json_query, 'utf-8', errors='ignore')
             json_response = simplejson.loads(json_query)
             if not('result' in json_response) or json_response['result'] == None or not('songs' in json_response['result']):
                 json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetSongs", "params": { "properties": ["title", "artist", "album", "file", "thumbnail", "duration", "fanart"], "limits": {"end":1}, "sort": {"method":"random"}, "filter": { "and":[{"field":"title","operator":"contains","value":"%s"},{"field":"artist","operator":"contains","value":"%s"}] } }, "id": 1}' % (similarTrackName, similarArtistName)) 
-                #json_query = str(json_query, 'utf-8', errors='ignore')
                 json_response = simplejson.loads(json_query)
                 
             # separate the records
@@ -272,7 +255,6 @@ class MyPlayer( xbmc.Player ) :
                     fanart = item["fanart"]
                     if(artist not in selectedArtist):
                         selectedArtist.append(artist)
-                        #print("[LFM PLG(PM)] Found: " + trackTitle.encode('utf-8') + " by: " + artist.encode('utf-8'))
                         log("[LFM PLG(PM)] Found: " + str(trackTitle.encode('utf-8')) + " by: " + str(artist.encode('utf-8')))
                         #if ((self.allowtrackrepeat == "true" or self.allowtrackrepeat == 1) or (self.unicode_normalize_string(trackPath.encode('utf-8')) not in self.addedTracks)):
                         if ((self.allowtrackrepeat == "true" or self.allowtrackrepeat == 1) or (trackPath.encode('utf-8') not in self.addedTracks)):
@@ -280,7 +262,6 @@ class MyPlayer( xbmc.Player ) :
                             if ((self.preferdifferentartist != "true" and self.preferdifferentartist != 1) or (similarArtistName) not in foundArtists):
                                 listitem = self.getListItem(trackTitle,artist,album,thumb,fanart,duration)
                                 xbmc.PlayList(0).add(url=trackPath, listitem=listitem)
-                                #print("[LFM PLG(PM)] Add track : " + trackTitle.encode('utf-8') + " by: " + artist.encode('utf-8'))
                                 log("[LFM PLG(PM)] Add track : " + str(trackTitle.encode('utf-8')) + " by: " + str(artist.encode('utf-8')))
                                 #self.addedTracks += [self.unicode_normalize_string(trackPath.encode('utf-8'))]
                                 self.addedTracks += [trackPath.encode('utf-8')]
@@ -312,14 +293,13 @@ class MyPlayer( xbmc.Player ) :
         listitem.setProperty('fanart_image',fanart)
         listitem.setInfo('music', { 'title': trackTitle, 'artist': artist, 'album': album, 'duration': duration })
         listitem.setArt({ 'thumb' : thumb, 'fanart' : fanart})
-        #listitem.setThumbnailImage(thumb)
         log("[LFM PLG(PM)] Fanart:%s" % fanart)
         return listitem
 
 def addauto(newentry, scriptcode):
     log("addauto started")
-    autoexecfile = xbmc.translatePath('special://home/userdata/autoexec.py')
-    #autoexecfile = "special://masterprofile/autoexec.py"
+    #autoexecfile = xbmc.translatePath('special://home/userdata/autoexec.py')
+    autoexecfile = xbmcvfs.translatePath('special://home/userdata/autoexec.py')
     if exists(autoexecfile):
         fh = open(autoexecfile)
         lines = []
@@ -347,8 +327,8 @@ def addauto(newentry, scriptcode):
 
 def removeauto(scriptcode):
     log("removeauto started")
-    autoexecfile = xbmc.translatePath('special://home/userdata/autoexec.py')
-    #autoexecfile = "special://masterprofile/autoexec.py"
+    #autoexecfile = xbmc.translatePath('special://home/userdata/autoexec.py')
+    autoexecfile = xbmcvfs.translatePath('special://home/userdata/autoexec.py')
     if exists(autoexecfile):
         fh = open(autoexecfile)
         lines = [ line for line in fh if not line.strip().endswith("#" + scriptcode) ]
@@ -360,8 +340,9 @@ def removeauto(scriptcode):
 BASE_RESOURCE_PATH = os.path.join( __cwd__, "resources" )
 
 process = os.path.join( BASE_RESOURCE_PATH , "pm.pid")
-p=MyPlayer()
 """
+# python 2 deprecated
+p=MyPlayer()
 while(1):
     if os.path.exists(process):
         if (xbmc.abortRequested):
@@ -378,5 +359,7 @@ while(1):
         while not monitor.abortRequested():
             if monitor.waitForAbort(1):
                 os.remove(process)
-                break
-
+                log("deleted pidfile")
+            xbmc.sleep(500)
+        else:
+            break

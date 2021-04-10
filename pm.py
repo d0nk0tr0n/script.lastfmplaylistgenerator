@@ -180,7 +180,7 @@ class MyPlayer( xbmc.Player ) :
         topTracks = re.findall("<track rank=.+?>.*?<name>(.+?)</name>.*?<playcount>(.+?)</playcount>.*?<listeners>(.+?)</listeners>.*?<artist>.*?<name>(.+?)</name>.*?</artist>.*?</track>", WebHTML2, re.DOTALL )
         log("[LFM PLG(PM)] Count: " + str(len(topTracks)))
         topTracks = [x for x in topTracks if int(x[1]) > self.minimalplaycount]     
-        return topTracks    
+        return topTracks
         
     def fetch_similarTracks( self, currentlyPlayingTitle, currentlyPlayingArtist ):
         apiMethod = "&method=track.getsimilar&limit=" + str(self.limitlastfmresult)

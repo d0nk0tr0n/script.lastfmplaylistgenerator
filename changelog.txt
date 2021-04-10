@@ -1,6 +1,6 @@
-1.3.0
+1.3.0.2
 - Changed: Initial port to python3 and matrix
-- TODO: Settings is broken in the UI - fix translations
+- Fixed: Settings translation to strings.po
 
 1.2.0
 - Changed : Optimise song selection

@@ -25,4 +25,4 @@ if os.path.exists(process):
 else:
     open ( process , "w" ).write( "running" )
     import pm
-    xbmc.executebuiltin('XBMC.RunScript(%s)' % os.path.join( __cwd__, "pm.py" ))
+    #xbmc.executebuiltin('XBMC.RunScript(%s)' % os.path.join( __cwd__, "pm.py" ))

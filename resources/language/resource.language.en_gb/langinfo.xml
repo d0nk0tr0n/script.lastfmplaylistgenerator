@@ -1,0 +1,12 @@
+  <language>
+    <charsets>
+      <gui>GB2312</gui>
+      <subtitle>GB2312</subtitle>
+    </charsets>
+  
+    <dvd>
+      <menu>cn</menu>
+      <audio>cn</audio>
+      <subtitle>cn</subtitle>
+    </dvd>
+  </language>

@@ -20,30 +20,30 @@ msgctxt "#33000"
 msgid "Allow same track to play more than once"
 msgstr ""
 
-msgctxt "#32001"
+msgctxt "#33001"
 msgid "Prefer different artist"
 msgstr ""
 
-msgctxt "#32002"
+msgctxt "#33002"
 msgid "Preferred number of tracks to add"
 msgstr ""
 
-msgctxt "#32003"
+msgctxt "#33003"
 msgid "Seconds delay before searching"
 msgstr ""
 
-msgctxt "#32004"
+msgctxt "#33004"
 msgid "Limit lastfm results (lower number for better similarity)"
 msgstr ""
 
-msgctxt "#32005"
+msgctxt "#33005"
 msgid "Minimum number of listening on last.fm (upper number for better songs)"
 msgstr ""
 
-msgctxt "#32006"
+msgctxt "#33006"
 msgid "Minimum Percentage similarity (upper number for better similarity)"
 msgstr ""
 
-msgctxt "#32007"
+msgctxt "#33007"
 msgid "Search mode"
 msgstr ""

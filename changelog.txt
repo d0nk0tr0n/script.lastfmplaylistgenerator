@@ -1,3 +1,10 @@
+1.3.0.3
+- Fixed: settings actually work now, simplified for display,
+    and short explanations added to readme
+- Added: Additional setting options (number of tracks to add
+    and delay (feature requests))
+- Changed: Startup method should be less clicks
+
 1.3.0.2
 - Changed: Initial port to python3 and matrix
 - Fixed: Settings translation to strings.po

@@ -40,8 +40,8 @@ class MyPlayer( xbmc.Player ) :
     
     allowtrackrepeat =  __settings__.getSetting( "allowtrackrepeat" )
     preferdifferentartist = __settings__.getSetting( "preferdifferentartist" )
-    numberoftrackstoadd = ( 1, 3, 5, 10, )[ int( __settings__.getSetting( "numberoftrackstoadd" ) ) ]
-    delaybeforesearching= ( 2, 10, 30, )[ int( __settings__.getSetting( "delaybeforesearching" ) ) ]
+    numberoftrackstoadd = ( 1, 2, 3, 5, 10, )[ int( __settings__.getSetting( "numberoftrackstoadd" ) ) ]
+    delaybeforesearching= ( 2, 5, 10, 30, )[ int( __settings__.getSetting( "delaybeforesearching" ) ) ]
     limitlastfmresult= ( 50, 100, 250, )[ int( __settings__.getSetting( "limitlastfmresult" ) ) ]
     minimalplaycount= ( 50, 100, 250, 500, )[ int( __settings__.getSetting( "minimalplaycount" ) ) ]
     minimalmatching= ( 1, 2, 5, 10, 20, )[ int( __settings__.getSetting( "minimalmatching" ) ) ]
@@ -94,7 +94,7 @@ class MyPlayer( xbmc.Player ) :
 
                 #log("[LFM PLG(PM)] cache_name: %s" % cache_name)
                 #thumb = "special://profile/Thumbnails/Music/%s/%s" % ( cache_name[:1], cache_name, )
-                #thumb = "special://profile/thumbnails/Music/%s/%s" % ( cache_name[:1], cache_name, )
+                thumb = "special://profile/thumbnails/Music/%s/%s" % ( cache_name[:1], cache_name, )
                 #log("THUMB IS: " + thumb)
 
                 duration = xbmc.Player().getMusicInfoTag().getDuration()
@@ -289,7 +289,7 @@ class MyPlayer( xbmc.Player ) :
             
         xbmc.executebuiltin('SetCurrentPlaylist(0)')
         
-    def getListItem(self, trackTitle, artist, album, thumb, fanart,duration):
+    def getListItem(self, trackTitle, artist, album, thumb, fanart, duration):
         log("getListItem started")
         listitem = xbmcgui.ListItem(trackTitle)
         if (fanart == ""):
@@ -298,7 +298,10 @@ class MyPlayer( xbmc.Player ) :
         listitem.setProperty('fanart_image',fanart)
         listitem.setInfo('music', { 'title': trackTitle, 'artist': artist, 'album': album, 'duration': duration })
         listitem.setArt({ 'thumb' : thumb, 'fanart' : fanart})
+        #if (thumb == ""):
+            #listitem.setArt({ 'thumb' : thumb, 'fanart' : fanart})
         log("[LFM PLG(PM)] Fanart:%s" % fanart)
+        log("[LFM PLG(PM)] Thumb:%s" % thumb)
         return listitem
 
 def addauto(newentry, scriptcode):

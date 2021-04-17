@@ -19,7 +19,7 @@ def log(txt):
     xbmc.log(msg=message, level=xbmc.LOGERROR)
 
 if os.path.exists(process):
-    if xbmcgui.Dialog().yesno("Last.FM playlist generator (partymode)", "Would you like to exit partymode?" ):
+    if xbmcgui.Dialog().yesno("Last.FM playlist generator", "Would you like to stop Last.FM playlist generator?" ):
         os.remove(process)        
         log("default os.remove")
 else:

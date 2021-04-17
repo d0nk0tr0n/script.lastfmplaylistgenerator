@@ -33,15 +33,15 @@ msgid "Seconds delay before searching"
 msgstr ""
 
 msgctxt "#33004"
-msgid "Limit lastfm results (lower number for better similarity)"
+msgid "Limit lastfm results"
 msgstr ""
 
 msgctxt "#33005"
-msgid "Minimum number of listening on last.fm (upper number for better songs)"
+msgid "Minimum number of listening on last.fm"
 msgstr ""
 
 msgctxt "#33006"
-msgid "Minimum Percentage similarity (upper number for better similarity)"
+msgid "Minimum percentage similarity per last.fm"
 msgstr ""
 
 msgctxt "#33007"

@@ -113,7 +113,8 @@ class MyPlayer( xbmc.Player ) :
 
     def onPlayBackStarted(self):
         log("[LFM PLG(PM)] onPlayBackStarted waiting:  " + str(self.delaybeforesearching) +" seconds")
-        if (self.timer is not None and self.timer.isAlive()):
+        #if (self.timer is not None and self.timer.isAlive()):
+        if (self.timer is not None and self.timer.is_alive()):
             self.timer.cancel()
             
         self.timer = threading.Timer(self.delaybeforesearching,self.startPlayBack)

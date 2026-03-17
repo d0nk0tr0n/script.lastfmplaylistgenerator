@@ -23,6 +23,7 @@ if os.path.exists(process):
         os.remove(process)        
         log("default os.remove")
 else:
-    open ( process , "w" ).write( "running" )
+    #open ( process , "w" ).write( "running" )
+    open ( process , "w" ).write( str(os.getpid()) )
     import pm
     #xbmc.executebuiltin('XBMC.RunScript(%s)' % os.path.join( __cwd__, "pm.py" ))

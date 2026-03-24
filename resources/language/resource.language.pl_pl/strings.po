@@ -1,0 +1,34 @@
+msgid ""
+msgstr ""
+
+msgctxt "#33000"
+msgid "Zezwalaj na odtwarzanie tego samego utworu więcej niż raz"
+msgstr ""
+
+msgctxt "#33001"
+msgid "Preferuj różnych artystów"
+msgstr ""
+
+msgctxt "#33002"
+msgid "Preferowana liczba utworów do dodania"
+msgstr ""
+
+msgctxt "#33003"
+msgid "Przerwa w sekundach między wyszukaniami"
+msgstr ""
+
+msgctxt "#33004"
+msgid "Ogranicz wyniki lastfm (mniejsza liczba dla lepszego podobieństwa)"
+msgstr ""
+
+msgctxt "#33005"
+msgid "Minimum number of listening on last.fm (upper number for better songs)"
+msgstr ""
+
+msgctxt "#33006"
+msgid "Minimum Percentage similarity (upper number for better similarity)"
+msgstr ""
+
+msgctxt "#33007"
+msgid "Search mode"
+msgstr ""

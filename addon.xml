@@ -13,12 +13,14 @@
   </extension> 
   <extension point="xbmc.addon.metadata">
     <website>https://github.com/d0nk0tr0n/script.lastfmplaylistgenerator</website>
+    <source>https://github.com/d0nk0tr0n/script.lastfmplaylistgenerator</source>
+    <license>GPL-2.0-only</license>
     <platform>all</platform>
     <summary lang="en_GB">last.fm Playlist Generator</summary>
     <description lang="en_GB">Create smart playlists with the help of last.fm</description>
     <assets>
-      <icon>icon.png</icon>
-      <fanart>fanart.jpg</fanart>
+        <icon>icon.png</icon>
+        <fanart>fanart.jpg</fanart>
     </assets>
   </extension>
 </addon>

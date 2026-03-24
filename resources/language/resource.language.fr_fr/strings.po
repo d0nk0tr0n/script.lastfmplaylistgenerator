@@ -1,0 +1,34 @@
+msgid ""
+msgstr ""
+
+msgctxt "#33000"
+msgid "Autoriser un même titre à être jouer plusieurs fois"
+msgstr ""
+
+msgctxt "#33001"
+msgid "Préférer différents artistes"
+msgstr ""
+
+msgctxt "#33002"
+msgid "Nombre de titre à ajouter"
+msgstr ""
+
+msgctxt "#33003"
+msgid "Délai en seconde avant de lancer la recherche"
+msgstr ""
+
+msgctxt "#33004"
+msgid "Nombre de résultats par recherche sur Last.fm"
+msgstr ""
+
+msgctxt "#33005"
+msgid "Nombre minimum d'écoute sur last.fm"
+msgstr ""
+
+msgctxt "#33006"
+msgid "Pourcentage minimal de similitude sur last.fm"
+msgstr ""
+
+msgctxt "#33007"
+msgid "Mode de recherche"
+msgstr ""

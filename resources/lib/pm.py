@@ -348,26 +348,13 @@ def removeauto(scriptcode):
 BASE_RESOURCE_PATH = os.path.join( __cwd__, "resources" )
 
 process = os.path.join( BASE_RESOURCE_PATH , "pm.pid")
-"""
-# python 2 deprecated
-p=MyPlayer()
-while(1):
-    if os.path.exists(process):
-        if (xbmc.abortRequested):
-            os.remove(process)
-            print "[LFM PLG(PM)] deleting pid"
-        xbmc.sleep(500)
-    else:
+p = MyPlayer()
+monitor = xbmc.Monitor()
+while os.path.exists(process):
+    if monitor.waitForAbort(1):
+        os.remove(process)
+        log("deleted pidfile, kodi abort requested")
         break
-"""
-p=MyPlayer()
-while(1):
-    if os.path.exists(process):
-        monitor = xbmc.Monitor()
-        while not monitor.abortRequested():
-            if monitor.waitForAbort(1):
-                os.remove(process)
-                log("deleted pidfile")
-            xbmc.sleep(500)
-        else:
-            break
+    xbmc.sleep(500)
+
+log("pm.py exiting")

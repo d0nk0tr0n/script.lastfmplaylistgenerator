@@ -12,14 +12,13 @@ import unicodedata
 import urllib.request
 import re
 from os.path import exists
-from os import remove
 import json as simplejson
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 # TODO before 20: xbmc.translatePath is deprecated and might be removed in future kodi versions. Please use xbmcvfs.translatePath instead.
 
 __settings__ = xbmcaddon.Addon(id='script.lastfmplaylistgenerator')
-__addonversion__ = __settings__.getAddonInfo('version')
+#__addonversion__ = __settings__.getAddonInfo('version')
 __cwd__          = __settings__.getAddonInfo('path')
 
 def log(txt):
@@ -28,6 +27,7 @@ def log(txt):
     #xbmc.log(msg=message, level=xbmc.LOGWARNING)
     # for release switch to DEBUG:
     xbmc.log(msg=message, level=xbmc.LOGDEBUG)
+
 class MyPlayer( xbmc.Player ) :
     countFoundTracks = 0
     addedTracks = []
@@ -48,7 +48,6 @@ class MyPlayer( xbmc.Player ) :
     timer = None
 
 
-    #apiPath = "http://ws.audioscrobbler.com/2.0/?api_key=71e468a84c1f40d4991ddccc46e40f1b"
     apiPath = "http://ws.audioscrobbler.com/2.0/?api_key=3ae834eee073c460a250ee08979184ec"
     
     def __init__ ( self ):
@@ -306,68 +305,39 @@ class MyPlayer( xbmc.Player ) :
         tag.setYear(year)
         tag.setGenres([str(genre)])
         return listitem
-#    def getListItem(self, trackTitle, artist, album, thumb, fanart, duration, year, genre):
-#        log("getListItem started")
-#        listitem = xbmcgui.ListItem(trackTitle)
-#        if (fanart == ""):
-#            cache_name = xbmc.getCacheThumbName( str(artist) )
-#            fanart = "special://profile/thumbnails/Music/%s/%s" % ( "Fanart", cache_name, )
-#        listitem.setProperty('fanart_image',fanart)
-#        listitem.setInfo('music', { 'title': trackTitle, 'artist': artist, 'album': album, 'duration': duration, 'year': year, 'genre': genre })
-#        listitem.setArt({ 'thumb' : thumb, 'fanart' : fanart})
-#        log("[LFM PLG(PM)] Fanart:%s" % fanart)
-#        log("[LFM PLG(PM)] Thumb:%s" % thumb)
-#        return listitem
 
 def addauto(newentry, scriptcode):
     log("addauto started")
-    #autoexecfile = xbmc.translatePath('special://home/userdata/autoexec.py')
     autoexecfile = xbmcvfs.translatePath('special://home/userdata/autoexec.py')
     if exists(autoexecfile):
-        #fh = open(autoexecfile)
         with open(autoexecfile) as fh:
             lines = [line for line in fh.readlines()]
-
-        #lines = []
-        #for line in fh.readlines():
-        #    lines.append(line)
         lines.append("import time" + "#" + scriptcode + "\n")
         lines.append("time.sleep(2)" + "#" + scriptcode + "\n")
         lines.append(newentry + "#" + scriptcode + "\n")
-        #fh.close()
-        #f = open(autoexecfile, "w")
         with open(autoexecfile, "w") as f:
+            if "import xbmc\n" not in lines:
+                f.write("import xbmc" + "#" + scriptcode + "\n")
+            if "import os\n" not in lines:
+                f.write("import os" + "#" + scriptcode + "\n")
             f.writelines(lines)
-        #if not "import xbmc\n" in lines:
-            f.write("import xbmc" + "#" + scriptcode + "\n")
-        #if not "import os\n" in lines:
-            f.write("import os" + "#" + scriptcode + "\n")
-        #f.writelines(lines)
-        f.close()
     else:
-        f = open(autoexecfile, "w")
-        f.write("import time" + "#" + scriptcode + "\n")
-        f.write("time.sleep(2)" + "#" + scriptcode + "\n")
-        f.write("import os" + "#" + scriptcode + "\n")
-        f.write("import xbmc" + "#" + scriptcode + "\n")
-        f.write(newentry + "#" + scriptcode + "\n")
-        f.close()
+        with open(autoexecfile, "w") as f:
+            f.write("import time" + "#" + scriptcode + "\n")
+            f.write("time.sleep(2)" + "#" + scriptcode + "\n")
+            f.write("import os" + "#" + scriptcode + "\n")
+            f.write("import xbmc" + "#" + scriptcode + "\n")
+            f.write(newentry + "#" + scriptcode + "\n")
 
 def removeauto(scriptcode):
     log("removeauto started")
-    #autoexecfile = xbmc.translatePath('special://home/userdata/autoexec.py')
     autoexecfile = xbmcvfs.translatePath('special://home/userdata/autoexec.py')
     if exists(autoexecfile):
-        #fh = open(autoexecfile)
         with open(autoexecfile) as fh:
-            lines = [line for line in fh.readlines()]
-        #lines = [ line for line in fh if not line.strip().endswith("#" + scriptcode) ]
-        #fh.close()
-        #f = open(autoexecfile, "w")
+            lines = [line for line in fh if not line.strip().endswith("#" + scriptcode)]
         with open(autoexecfile, "w") as f:
             f.writelines(lines)
-        #f.writelines(lines)
-        #f.close()
+
         
 BASE_RESOURCE_PATH = os.path.join( __cwd__, "resources" )
 

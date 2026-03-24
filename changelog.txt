@@ -1,3 +1,6 @@
+1.3.2.1
+- Fixed: actually include the start/stop logic fix and other misses
+
 1.3.2.0
 - Changed: strings.po format instead of strings.xml
 - Changed: refactored startup logic

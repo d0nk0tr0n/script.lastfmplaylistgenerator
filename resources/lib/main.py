@@ -10,11 +10,11 @@ def run():
     addon = xbmcaddon.Addon()
     cwd = addon.getAddonInfo('path')
     process = os.path.join(cwd, 'resources', 'pm.pid')
-
     if os.path.exists(process):
-        if xbmcgui.Dialog().yesno("Last.FM playlist generator", "Would you like to stop Last.FM playlist generator?"):
+        if xbmcgui.Dialog().yesno("last.fm playlist generator", "Would you like to stop last.fm playlist generator?"):
             os.remove(process)
             log("default os.remove")
     else:
-        open(process, 'w').write(str(os.getpid()))
+        with open(process, 'w') as f:
+            f.write(str(os.getpid()))
         import pm

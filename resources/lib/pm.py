@@ -6,29 +6,28 @@
 import os
 import random
 import difflib
-import sys, time
+import time
 import threading
 import unicodedata
 import urllib.request
 import re
 from os.path import exists
-from os import remove
 import json as simplejson
-from urllib.parse import quote
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
 # TODO before 20: xbmc.translatePath is deprecated and might be removed in future kodi versions. Please use xbmcvfs.translatePath instead.
 
 __settings__ = xbmcaddon.Addon(id='script.lastfmplaylistgenerator')
-__addonversion__ = __settings__.getAddonInfo('version')
+#__addonversion__ = __settings__.getAddonInfo('version')
 __cwd__          = __settings__.getAddonInfo('path')
 
 def log(txt):
     message = '%s: %s' % ("LPM", txt)
     # LOGWARNING if you're developing and don't want too much chatter from running kodi in debug
-    xbmc.log(msg=message, level=xbmc.LOGWARNING)
+    #xbmc.log(msg=message, level=xbmc.LOGWARNING)
     # for release switch to DEBUG:
-    #xbmc.log(msg=message, level=xbmc.LOGDEBUG)
+    xbmc.log(msg=message, level=xbmc.LOGDEBUG)
+
 class MyPlayer( xbmc.Player ) :
     countFoundTracks = 0
     addedTracks = []
@@ -49,10 +48,10 @@ class MyPlayer( xbmc.Player ) :
     timer = None
 
 
-    #apiPath = "http://ws.audioscrobbler.com/2.0/?api_key=71e468a84c1f40d4991ddccc46e40f1b"
     apiPath = "http://ws.audioscrobbler.com/2.0/?api_key=3ae834eee073c460a250ee08979184ec"
     
     def __init__ ( self ):
+        self.addedTracks = []
         log("__init__ started")
         #if not os.path.exists(xbmc.translatePath("special://userdata/advancedsettings.xml")):
         if not os.path.exists(xbmcvfs.translatePath("special://userdata/advancedsettings.xml")):
@@ -119,7 +118,7 @@ class MyPlayer( xbmc.Player ) :
         log("unicode_normalize_string is: " + text)
         # old python 2 for posterity
         #return unicodedata.normalize('NFD', str(text, 'utf-8')).encode('ascii', 'ignore').upper().replace("-","")   
-        return unicodedata.normalize(text).encode('ascii', 'ignore').upper().replace("-","")   
+        return unicodedata.normalize('NFD', text).encode('ascii', 'ignore').upper().replace(b"-", b"")
     
     def fetch_searchTrack(self, currentlyPlayingTitle, currentlyPlayingArtist ):
         log("fetch_searchTrack has started " + currentlyPlayingTitle + " | " + currentlyPlayingArtist)
@@ -146,7 +145,7 @@ class MyPlayer( xbmc.Player ) :
                     foundTracks.append([foundTrackName, foundArtistName])
                     log("[LFM PLG(PM)] Found Similar Track Name : " + foundTrackName + " by: " + foundArtistName)
         
-        log("main foundTracks is " + foundTracks)
+        log("main foundTracks is " + str(foundTracks))
         return foundTracks
 
     def fetch_similarArtists( self, currentlyPlayingArtist ):
@@ -246,9 +245,7 @@ class MyPlayer( xbmc.Player ) :
                 
             # separate the records
             if 'result' in json_response and json_response['result'] != None and 'songs' in json_response['result']:
-                count = 0
                 for item in json_response['result']['songs']:
-                    count += 1
                     artist = ""
                     if (len(item["artist"]) > 0):
                         artist = item["artist"][0]
@@ -295,55 +292,52 @@ class MyPlayer( xbmc.Player ) :
         log("getListItem started")
         listitem = xbmcgui.ListItem(trackTitle)
         if (fanart == ""):
-            cache_name = xbmc.getCacheThumbName( str(artist) )
-            fanart = "special://profile/thumbnails/Music/%s/%s" % ( "Fanart", cache_name, )
-        listitem.setProperty('fanart_image',fanart)
-        listitem.setInfo('music', { 'title': trackTitle, 'artist': artist, 'album': album, 'duration': duration, 'year': year, 'genre': genre })
-        listitem.setArt({ 'thumb' : thumb, 'fanart' : fanart})
+            cache_name = xbmc.getCacheThumbName(str(artist))
+            fanart = "special://profile/thumbnails/Music/%s/%s" % ("Fanart", cache_name,)
+        listitem.setArt({'thumb': thumb, 'fanart': fanart})
         log("[LFM PLG(PM)] Fanart:%s" % fanart)
         log("[LFM PLG(PM)] Thumb:%s" % thumb)
+        tag = listitem.getMusicInfoTag()
+        tag.setTitle(trackTitle)
+        tag.setArtist(artist)
+        tag.setAlbum(album)
+        tag.setDuration(duration)
+        tag.setYear(year)
+        tag.setGenres([str(genre)])
         return listitem
 
 def addauto(newentry, scriptcode):
     log("addauto started")
-    #autoexecfile = xbmc.translatePath('special://home/userdata/autoexec.py')
     autoexecfile = xbmcvfs.translatePath('special://home/userdata/autoexec.py')
     if exists(autoexecfile):
-        fh = open(autoexecfile)
-        lines = []
-        for line in fh.readlines():
-            lines.append(line)
+        with open(autoexecfile) as fh:
+            lines = [line for line in fh.readlines()]
         lines.append("import time" + "#" + scriptcode + "\n")
         lines.append("time.sleep(2)" + "#" + scriptcode + "\n")
         lines.append(newentry + "#" + scriptcode + "\n")
-        fh.close()
-        f = open(autoexecfile, "w")
-        if not "import xbmc\n" in lines:
-            f.write("import xbmc" + "#" + scriptcode + "\n")
-        if not "import os\n" in lines:
-            f.write("import os" + "#" + scriptcode + "\n")
-        f.writelines(lines)
-        f.close()
+        with open(autoexecfile, "w") as f:
+            if "import xbmc\n" not in lines:
+                f.write("import xbmc" + "#" + scriptcode + "\n")
+            if "import os\n" not in lines:
+                f.write("import os" + "#" + scriptcode + "\n")
+            f.writelines(lines)
     else:
-        f = open(autoexecfile, "w")
-        f.write("import time" + "#" + scriptcode + "\n")
-        f.write("time.sleep(2)" + "#" + scriptcode + "\n")
-        f.write("import os" + "#" + scriptcode + "\n")
-        f.write("import xbmc" + "#" + scriptcode + "\n")
-        f.write(newentry + "#" + scriptcode + "\n")
-        f.close()
+        with open(autoexecfile, "w") as f:
+            f.write("import time" + "#" + scriptcode + "\n")
+            f.write("time.sleep(2)" + "#" + scriptcode + "\n")
+            f.write("import os" + "#" + scriptcode + "\n")
+            f.write("import xbmc" + "#" + scriptcode + "\n")
+            f.write(newentry + "#" + scriptcode + "\n")
 
 def removeauto(scriptcode):
     log("removeauto started")
-    #autoexecfile = xbmc.translatePath('special://home/userdata/autoexec.py')
     autoexecfile = xbmcvfs.translatePath('special://home/userdata/autoexec.py')
     if exists(autoexecfile):
-        fh = open(autoexecfile)
-        lines = [ line for line in fh if not line.strip().endswith("#" + scriptcode) ]
-        fh.close()
-        f = open(autoexecfile, "w")
-        f.writelines(lines)
-        f.close()
+        with open(autoexecfile) as fh:
+            lines = [line for line in fh if not line.strip().endswith("#" + scriptcode)]
+        with open(autoexecfile, "w") as f:
+            f.writelines(lines)
+
         
 BASE_RESOURCE_PATH = os.path.join( __cwd__, "resources" )
 

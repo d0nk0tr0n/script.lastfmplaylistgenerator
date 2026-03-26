@@ -1,3 +1,13 @@
+1.4.0.1
+Major Changes:
+  - Changed: Refactored module structure
+  - Changed: deprecated setInfo() / setProperty()
+  - Fixed: start/stop script logic
+  - Fixed: double thread bug
+  - Fixed: addedTracks class-level mutable state
+  - Fixed: cruft cleanup and optimization
+  - Added: cleaner log functions
+
 1.3.2.3
 - Fixed: misc cruft removal and optimizations
 

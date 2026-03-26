@@ -36,7 +36,7 @@ def sanitize(text):
                 .replace("&amp;", "and"))
 
 def fetch_url(url):
-    log("Request :", url)
+    log("Request :", re.sub(r'api_key=[^&]+', 'api_key=***', url))
     with urllib.request.urlopen(url) as sock:
         return sock.read().decode('utf-8')
 

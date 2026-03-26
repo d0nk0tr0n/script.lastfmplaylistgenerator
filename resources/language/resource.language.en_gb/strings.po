@@ -36,3 +36,7 @@ msgstr ""
 msgctxt "#33008"
 msgid "Last.fm API key"
 msgstr ""
+
+msgctxt "#33009"
+msgid "Limit playlist queue"
+msgstr ""

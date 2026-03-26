@@ -118,6 +118,7 @@ class MyPlayer(xbmc.Player):
         self.API_PATH              = self.API_BASE + self.apikey
         self.allowtrackrepeat      = __settings__.getSetting("allowtrackrepeat")
         self.preferdifferentartist = __settings__.getSetting("preferdifferentartist")
+        self.limitplaylistqueue   = (0, 5, 10, 20, 50)[int(__settings__.getSetting("limitplaylistqueue"))]
         self.numberoftrackstoadd   = (1, 2, 3, 5, 10)[int(__settings__.getSetting("numberoftrackstoadd"))]
         self.delaybeforesearching  = (2, 5, 10, 30)[int(__settings__.getSetting("delaybeforesearching"))]
         self.limitlastfmresult     = (50, 100, 250)[int(__settings__.getSetting("limitlastfmresult"))]
@@ -169,9 +170,11 @@ class MyPlayer(xbmc.Player):
         return True
 
     def _playlist_has_room(self):
+        if self.limitplaylistqueue == 0:
+            return True
         playlist  = xbmc.PlayList(0)
         remaining = playlist.size() - playlist.getposition()
-        return remaining < self.numberoftrackstoadd + 1
+        return remaining < self.limitplaylistqueue
 
     def unicode_normalize_string(self, text):
         return unicodedata.normalize('NFD', text).encode('ascii', 'ignore').upper().replace(b"-", b"")

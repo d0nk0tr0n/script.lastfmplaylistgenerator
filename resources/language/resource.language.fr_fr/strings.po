@@ -36,3 +36,7 @@ msgstr ""
 msgctxt "#33008"
 msgid "Clé API Last.fm"
 msgstr ""
+
+msgctxt "#33009"
+msgid "Limiter la file de lecture"
+msgstr ""

@@ -9,6 +9,7 @@
 		<setting id="minimalplaycount" type="enum" values="50|100|250|500" label="33005" default="1"/>
 		<setting id="minimalmatching" type="enum" values="1|2|5|10|20" label="33006" default="1"/>
 		<setting id="mode" type="enum" values="Similar tracks|Top tracks of similar artist|Custom" label="33007" default="2"/>
+		<setting id="limitplaylistqueue" type="enum" values="Off|5|10|20|50" label="33009" default="0"/>
 		<setting id="apikey" type="text" label="33008" default="3ae834eee073c460a250ee08979184ec"/>
 	</category>
 </settings>

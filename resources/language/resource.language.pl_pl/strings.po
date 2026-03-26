@@ -22,17 +22,21 @@ msgid "Ogranicz wyniki lastfm (mniejsza liczba dla lepszego podobieństwa)"
 msgstr ""
 
 msgctxt "#33005"
-msgid "Minimum number of listening on last.fm (upper number for better songs)"
+msgid "Minimalna liczba odtworzeń na last.fm (wyższa liczba dla lepszych utworów)"
 msgstr ""
 
 msgctxt "#33006"
-msgid "Minimum Percentage similarity (upper number for better similarity)"
+msgid "Minimalny procent podobieństwa (wyższa liczba dla lepszego podobieństwa)"
 msgstr ""
 
 msgctxt "#33007"
-msgid "Search mode"
+msgid "Tryb wyszukiwania"
 msgstr ""
 
 msgctxt "#33008"
 msgid "Klucz API Last.fm"
+msgstr ""
+
+msgctxt "#33009"
+msgid "Ogranicz kolejkę playlisty"
 msgstr ""

@@ -315,6 +315,8 @@ class MyPlayer(xbmc.Player):
 
             if self.countFoundTracks >= self.numberoftrackstoadd:
                 break
+            if not self._playlist_has_room():
+                break
 
         if self.countFoundTracks == 0:
             log("None found")

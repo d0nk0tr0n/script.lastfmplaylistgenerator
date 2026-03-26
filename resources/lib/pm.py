@@ -103,7 +103,7 @@ def removeauto(scriptcode):
 
 class MyPlayer(xbmc.Player):
     SCRIPT_NAME = "Last.fm Playlist Generator"
-    API_PATH    = "http://ws.audioscrobbler.com/2.0/?api_key=3ae834eee073c460a250ee08979184ec"
+    API_BASE    = "http://ws.audioscrobbler.com/2.0/?api_key="
 
     def __init__(self):
         self.addedTracks           = []
@@ -114,6 +114,8 @@ class MyPlayer(xbmc.Player):
         self.timeStarted           = time.time()
         self.timer                 = None
 
+        self.apikey                = __settings__.getSetting("apikey")
+        self.API_PATH              = self.API_BASE + self.apikey
         self.allowtrackrepeat      = __settings__.getSetting("allowtrackrepeat")
         self.preferdifferentartist = __settings__.getSetting("preferdifferentartist")
         self.numberoftrackstoadd   = (1, 2, 3, 5, 10)[int(__settings__.getSetting("numberoftrackstoadd"))]

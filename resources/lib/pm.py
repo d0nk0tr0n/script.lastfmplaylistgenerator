@@ -192,7 +192,7 @@ class MyPlayer(xbmc.Player):
         tag    = player.getMusicInfoTag()
         title  = tag.getTitle()
         artist = tag.getArtist()
-        log("Artist: ", artist, "-", title, "started playing")
+        log("Artist:", artist, "-", title, "started playing")
         self.countFoundTracks = 0
 
         if self.firstRun == 1:

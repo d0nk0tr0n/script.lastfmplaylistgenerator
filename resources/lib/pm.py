@@ -174,7 +174,7 @@ class MyPlayer(xbmc.Player):
             return True
         playlist  = xbmc.PlayList(0)
         remaining = playlist.size() - playlist.getposition()
-        return remaining < self.limitplaylistqueue
+        return remaining <= self.limitplaylistqueue
 
     def unicode_normalize_string(self, text):
         return unicodedata.normalize('NFD', text).encode('ascii', 'ignore').upper().replace(b"-", b"")

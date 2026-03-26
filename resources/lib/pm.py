@@ -24,7 +24,7 @@ __cwd__       = __settings__.getAddonInfo('path')
 # -------------------------------------------------------------------------
 
 def log(*args):
-    message = 'LPM: ' + ' '.join(str(a.decode('utf-8') if isinstance(a, bytes) else a) for a in args)
+    message = 'ADDON LFM: ' + ' '.join(str(a.decode('utf-8') if isinstance(a, bytes) else a) for a in args)
     xbmc.log(msg=message, level=xbmc.LOGWARNING)
     #xbmc.log(msg=message, level=xbmc.LOGDEBUG)
 
@@ -102,7 +102,7 @@ def removeauto(scriptcode):
 # -------------------------------------------------------------------------
 
 class MyPlayer(xbmc.Player):
-    SCRIPT_NAME = "LAST.FM Playlist Generator"
+    SCRIPT_NAME = "Last.fm Playlist Generator"
     API_PATH    = "http://ws.audioscrobbler.com/2.0/?api_key=3ae834eee073c460a250ee08979184ec"
 
     def __init__(self):

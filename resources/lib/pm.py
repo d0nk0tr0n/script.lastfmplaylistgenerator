@@ -113,6 +113,7 @@ class MyPlayer(xbmc.Player):
         self.dbtype                = 'sqlite3'
         self.timeStarted           = time.time()
         self.timer                 = None
+        self._timer_lock           = threading.Lock()
 
         self.apikey                = __settings__.getSetting("apikey")
         self.API_PATH              = self.API_BASE + self.apikey
@@ -181,10 +182,11 @@ class MyPlayer(xbmc.Player):
 
     def onPlayBackStarted(self):
         log("onPlayBackStarted waiting:", str(self.delaybeforesearching), "seconds")
-        if self.timer is not None and self.timer.is_alive():
-            self.timer.cancel()
-        self.timer = threading.Timer(self.delaybeforesearching, self.startPlayBack)
-        self.timer.start()
+        with self._timer_lock:
+            if self.timer is not None and self.timer.is_alive():
+                self.timer.cancel()
+            self.timer = threading.Timer(self.delaybeforesearching, self.startPlayBack)
+            self.timer.start()
 
     def startPlayBack(self):
         log("startPlayBack started")

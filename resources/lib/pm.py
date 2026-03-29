@@ -308,7 +308,6 @@ class MyPlayer(xbmc.Player):
                 xbmc.PlayList(0).add(url=trackPath, listitem=listitem)
                 log("Add track:", trackTitle, "by:", found_artist)
                 self.addedTracks.append(trackPath)
-                xbmc.executebuiltin("Container.Refresh")
                 self.countFoundTracks += 1
                 if found_artist not in foundArtists:
                     foundArtists.append(found_artist)
@@ -323,6 +322,7 @@ class MyPlayer(xbmc.Player):
             xbmc.executebuiltin("Notification(" + self.SCRIPT_NAME + ",No similar tracks were found)")
             return False
 
+        xbmc.executebuiltin("Container.Refresh")
         xbmc.executebuiltin('SetCurrentPlaylist(0)')
 
     def getListItem(self, trackTitle, artist, album, thumb, fanart, duration, year, genre):
@@ -341,6 +341,7 @@ class MyPlayer(xbmc.Player):
         tag.setDuration(duration)
         tag.setYear(year)
         tag.setGenres(genre if isinstance(genre, list) else [str(genre)])
+        tag.setTrack(0)
         return listitem
 
 

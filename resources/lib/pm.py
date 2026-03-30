@@ -341,7 +341,7 @@ class MyPlayer(xbmc.Player):
         tag.setDuration(duration)
         tag.setYear(year)
         tag.setGenres(genre if isinstance(genre, list) else [str(genre)])
-        tag.setTrack(0)
+        tag.setTrack(-1)
         return listitem
 
 

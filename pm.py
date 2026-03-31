@@ -68,6 +68,7 @@ class MyPlayer( xbmc.Player ) :
                 genre = xbmc.Player().getMusicInfoTag().getGenre()
                 fanart = xbmc.getInfoLabel("Player.Art(fanart)")
                 listitem = self.getListItem(currentlyPlayingTitle,currentlyPlayingArtist,album,thumb,fanart,duration,year,genre)
+                xbmc.Player().updateInfoTag(listitem)
                 xbmc.PlayList(0).clear()
                 xbmc.executebuiltin('XBMC.ActivateWindow(10500)')
                 xbmc.PlayList(0).add(url= xbmc.Player().getMusicInfoTag().getURL(), listitem = listitem)

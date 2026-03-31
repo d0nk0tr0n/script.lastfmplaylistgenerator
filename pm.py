@@ -58,7 +58,7 @@ class MyPlayer( xbmc.Player ) :
         if xbmc.Player().isPlayingAudio():
             currentlyPlayingTitle = xbmc.Player().getMusicInfoTag().getTitle()
             currentlyPlayingArtist = xbmc.Player().getMusicInfoTag().getArtist()
-            log("" + currentlyPlayingArtist + " - " + currentlyPlayingTitle + " started playing")
+            log(currentlyPlayingArtist + " - " + currentlyPlayingTitle + " started playing")
             self.countFoundTracks = 0
             if (self.firstRun == 1):
                 self.firstRun = 0

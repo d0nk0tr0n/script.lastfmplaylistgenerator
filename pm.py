@@ -266,16 +266,12 @@ BASE_RESOURCE_PATH = os.path.join( __cwd__, "resources" )
 process = os.path.join( BASE_RESOURCE_PATH , "pm.pid")
 
 p=MyPlayer()
-while(1):
-    if os.path.exists(process):
-        monitor = xbmc.Monitor()
-        while not monitor.abortRequested():
-            if monitor.waitForAbort(1):
-                os.remove(process)
-                log("deleted pidfile")
-            xbmc.sleep(500)
-        else:
-            break
-    else:
-        log("process file gone, exiting")
+monitor = xbmc.Monitor()
+while os.path.exists(process) and not monitor.abortRequested():
+    if monitor.waitForAbort(1):
+        if os.path.exists(process):
+            os.remove(process)
+            log("deleted pidfile")
         break
+    xbmc.sleep(500)
+log("process file gone, exiting")

@@ -206,6 +206,12 @@ class MyPlayer( xbmc.Player ) :
                                 self.countFoundTracks += 1
                                 if (similarArtistName not in foundArtists):
                                     foundArtists += [similarArtistName]
+                            else:
+                                log("Skipping - artist already added: " + similarArtistName)
+                        else:
+                            log("Skipping - repeat track: " + str(trackTitle))
+            else:
+                log("Not in library: " + similarTrackName + " - " + similarArtistName)
 
                 if (self.countFoundTracks >= self.numberoftrackstoadd):
                     break

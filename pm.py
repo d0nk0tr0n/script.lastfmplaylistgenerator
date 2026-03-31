@@ -48,6 +48,7 @@ class MyPlayer( xbmc.Player ) :
         process = os.path.join( BASE_RESOURCE_PATH , "pm.pid")
         removeauto('lastfmplaylistgeneratorpm')
         addauto("if os.path.exists('" + os.path.normpath(process).replace('\\','\\\\') + "'):#lastfmplaylistgeneratorpm\n\tos.remove('" + os.path.normpath(process).replace('\\','\\\\') + "')","lastfmplaylistgeneratorpm")
+        log("allowtrackrepeat=%r preferdifferentartist=%r numberoftrackstoadd=%r" % (self.allowtrackrepeat, self.preferdifferentartist, self.numberoftrackstoadd))
         xbmc.executebuiltin("Notification(" + self.SCRIPT_NAME+",Start by playing a song)")
         log("__init__ completed")
 
@@ -93,12 +94,15 @@ class MyPlayer( xbmc.Player ) :
         WebHTML = WebSock.read().decode('utf-8')
         WebSock.close()
 
-        similarArtists = re.findall("<artist>.*?<name>(.+?)</name>.*?<mbid>(.+?)</mbid>.*?<match>(.+?)</match>.*?</artist>", WebHTML, re.DOTALL )
+        similarArtists = re.findall("<artist>.*?<name>(.+?)</name>.*?<mbid>(.*?)</mbid>.*?<match>(.+?)</match>.*?</artist>", WebHTML, re.DOTALL )
         similarArtists = [x for x in similarArtists if float(x[2]) > (float(self.minimalmatching)/100.0)]
         return similarArtists
 
     def find_Artist(self, artistName):
-        json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetArtists", "params": { "filter": {"field":"artist","operator":"is","value":"%s"} }, "id": 1}' % (artistName))
+        json_query = xbmc.executeJSONRPC(simplejson.dumps({
+            "jsonrpc": "2.0", "method": "AudioLibrary.GetArtists",
+            "params": {"filter": {"field": "artist", "operator": "is", "value": artistName}},
+            "id": 1}))
         json_response = simplejson.loads(json_query)
         if 'result' in json_response and json_response['result'] != None and 'artists' in json_response['result'] :
             return True
@@ -141,6 +145,9 @@ class MyPlayer( xbmc.Player ) :
             similarArtists = self.fetch_similarArtists(currentlyPlayingArtist)
             log("[LFM PLG(PM)] Nb Similar Artists : " + str(len(similarArtists)))
             for similarArtistName, mbid, matchValue in similarArtists:
+                if not mbid:
+                    log("[LFM PLG(PM)] Skipping " + similarArtistName + " - no mbid")
+                    continue
                 if self.find_Artist(similarArtistName):
                     similarTracks += self.fetch_topTracksOfArtist(mbid)
 
@@ -154,10 +161,21 @@ class MyPlayer( xbmc.Player ) :
             similarTrackName = similarTrackName.replace("+"," ").replace("("," ").replace(")"," ").replace("&quot","''").replace("&amp;","and")
             similarArtistName = similarArtistName.replace("+"," ").replace("("," ").replace(")"," ").replace("&quot","''").replace("&amp;","and")
             log("Looking for: " + similarTrackName + " - " + similarArtistName + " - " + matchValue + "/" + playCount)
-            json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetSongs", "params": { "properties": ["title", "artist", "album", "file", "thumbnail", "duration", "fanart", "year", "genre" ], "limits": {"end":1}, "sort": {"method":"random"}, "filter": { "and":[{"field":"title","operator":"is","value":"%s"},{"field":"artist","operator":"is","value":"%s"}] } }, "id": 1}' % (similarTrackName, similarArtistName))
+            props = ["title", "artist", "album", "file", "thumbnail", "duration", "fanart", "year", "genre"]
+            json_query = xbmc.executeJSONRPC(simplejson.dumps({
+                "jsonrpc": "2.0", "method": "AudioLibrary.GetSongs",
+                "params": {"properties": props, "limits": {"end": 1}, "sort": {"method": "random"},
+                           "filter": {"and": [{"field": "title", "operator": "is", "value": similarTrackName},
+                                              {"field": "artist", "operator": "is", "value": similarArtistName}]}},
+                "id": 1}))
             json_response = simplejson.loads(json_query)
             if not('result' in json_response) or json_response['result'] == None or not('songs' in json_response['result']):
-                json_query = xbmc.executeJSONRPC('{"jsonrpc": "2.0", "method": "AudioLibrary.GetSongs", "params": { "properties": ["title", "artist", "album", "file", "thumbnail", "duration", "fanart", "year", "genre" ], "limits": {"end":1}, "sort": {"method":"random"}, "filter": { "and":[{"field":"title","operator":"contains","value":"%s"},{"field":"artist","operator":"contains","value":"%s"}] } }, "id": 1}' % (similarTrackName, similarArtistName))
+                json_query = xbmc.executeJSONRPC(simplejson.dumps({
+                    "jsonrpc": "2.0", "method": "AudioLibrary.GetSongs",
+                    "params": {"properties": props, "limits": {"end": 1}, "sort": {"method": "random"},
+                               "filter": {"and": [{"field": "title", "operator": "contains", "value": similarTrackName},
+                                                  {"field": "artist", "operator": "contains", "value": similarArtistName}]}},
+                    "id": 1}))
                 json_response = simplejson.loads(json_query)
 
             # separate the records
@@ -177,8 +195,8 @@ class MyPlayer( xbmc.Player ) :
                     if(artist not in selectedArtist):
                         selectedArtist.append(artist)
                         log("[LFM PLG(PM)] Found: " + str(trackTitle) + " by: " + str(artist))
-                        if ((self.allowtrackrepeat == "true" or self.allowtrackrepeat == 1) or (trackPath not in self.addedTracks)):
-                            if ((self.preferdifferentartist != "true" and self.preferdifferentartist != 1) or (similarArtistName) not in foundArtists):
+                        if (self.allowtrackrepeat == "true" or (trackPath not in self.addedTracks)):
+                            if (self.preferdifferentartist != "true" or similarArtistName not in foundArtists):
                                 listitem = self.getListItem(trackTitle,artist,album,thumb,fanart,duration,year,genre)
                                 xbmc.PlayList(0).add(url=trackPath, listitem=listitem)
                                 log("[LFM PLG(PM)] Add track : " + str(trackTitle) + " by: " + str(artist))
@@ -259,3 +277,5 @@ while(1):
             xbmc.sleep(500)
         else:
             break
+    else:
+        break

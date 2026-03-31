@@ -278,4 +278,5 @@ while(1):
         else:
             break
     else:
+        log("process file gone, exiting")
         break

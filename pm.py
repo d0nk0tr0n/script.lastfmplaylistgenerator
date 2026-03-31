@@ -10,6 +10,7 @@ import threading
 import urllib.request
 import urllib.parse
 import re
+import html
 import json as simplejson
 from os.path import exists
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
@@ -158,8 +159,8 @@ class MyPlayer( xbmc.Player ) :
         random.shuffle(similarTracks)
         selectedArtist = []
         for similarTrackName, playCount, matchValue, similarArtistName in similarTracks:
-            similarTrackName = similarTrackName.replace("+"," ").replace("("," ").replace(")"," ").replace("&quot","''").replace("&amp;","and")
-            similarArtistName = similarArtistName.replace("+"," ").replace("("," ").replace(")"," ").replace("&quot","''").replace("&amp;","and")
+            similarTrackName = html.unescape(similarTrackName)
+            similarArtistName = html.unescape(similarArtistName)
             log("Looking for: " + similarTrackName + " - " + similarArtistName + " - " + matchValue + "/" + playCount)
             props = ["title", "artist", "album", "file", "thumbnail", "duration", "fanart", "year", "genre"]
             json_query = xbmc.executeJSONRPC(simplejson.dumps({

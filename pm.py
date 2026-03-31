@@ -19,7 +19,7 @@ __settings__ = xbmcaddon.Addon(id='script.lastfmplaylistgeneratorPM')
 __cwd__      = __settings__.getAddonInfo('path')
 
 def log(txt):
-    message = '%s: %s' % ("LPM", txt)
+    message = '%s: %s' % ("[ADDON LFM]", txt)
     xbmc.log(msg=message, level=xbmc.LOGWARNING)
 
 class MyPlayer( xbmc.Player ) :
@@ -54,16 +54,16 @@ class MyPlayer( xbmc.Player ) :
         log("__init__ completed")
 
     def startPlayBack(self):
-        log("[LFM PLG(PM)] startPlayBack started")
+        log("startPlayBack started")
         if xbmc.Player().isPlayingAudio():
             currentlyPlayingTitle = xbmc.Player().getMusicInfoTag().getTitle()
             currentlyPlayingArtist = xbmc.Player().getMusicInfoTag().getArtist()
-            log("[LFM PLG(PM)] " + currentlyPlayingArtist + " - " + currentlyPlayingTitle + " started playing")
+            log("" + currentlyPlayingArtist + " - " + currentlyPlayingTitle + " started playing")
             self.countFoundTracks = 0
             if (self.firstRun == 1):
                 self.firstRun = 0
                 album = xbmc.Player().getMusicInfoTag().getAlbum()
-                log("[LFM PLG(PM)] Playing file: %s" % xbmc.Player().getMusicInfoTag().getURL())
+                log("Playing file: %s" % xbmc.Player().getMusicInfoTag().getURL())
                 thumb = xbmc.getInfoLabel("Player.Art(thumb)")
                 duration = xbmc.Player().getMusicInfoTag().getDuration()
                 year = xbmc.Player().getMusicInfoTag().getYear()
@@ -79,7 +79,7 @@ class MyPlayer( xbmc.Player ) :
             self.main_similarTracks(currentlyPlayingTitle,currentlyPlayingArtist)
 
     def onPlayBackStarted(self):
-        log("[LFM PLG(PM)] onPlayBackStarted waiting:  " + str(self.delaybeforesearching) +" seconds")
+        log("onPlayBackStarted waiting:  " + str(self.delaybeforesearching) +" seconds")
         if (self.timer is not None and self.timer.is_alive()):
             self.timer.cancel()
 
@@ -91,7 +91,7 @@ class MyPlayer( xbmc.Player ) :
 
         Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist)
         WebSock = urllib.request.urlopen(Base_URL)
-        log("[LFM PLG(PM)] Request : " + Base_URL)
+        log("Request : " + Base_URL)
         WebHTML = WebSock.read().decode('utf-8')
         WebSock.close()
 
@@ -114,11 +114,11 @@ class MyPlayer( xbmc.Player ) :
 
         Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(mbIdArtist)
         WebSock = urllib.request.urlopen(Base_URL)
-        log("[LFM PLG(PM)] Request : " + Base_URL)
+        log("Request : " + Base_URL)
         WebHTML2 = WebSock.read().decode('utf-8')
         WebSock.close()
         topTracks = re.findall("<track rank=.+?>.*?<name>(.+?)</name>.*?<playcount>(.+?)</playcount>.*?<listeners>(.+?)</listeners>.*?<artist>.*?<name>(.+?)</name>.*?</artist>.*?</track>", WebHTML2, re.DOTALL )
-        log("[LFM PLG(PM)] Count: " + str(len(topTracks)))
+        log("Count: " + str(len(topTracks)))
         topTracks = [x for x in topTracks if int(x[1]) > self.minimalplaycount]
         return topTracks
 
@@ -127,7 +127,7 @@ class MyPlayer( xbmc.Player ) :
 
         Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist) + "&track=" + urllib.parse.quote_plus(currentlyPlayingTitle)
         WebSock = urllib.request.urlopen(Base_URL)
-        log("[LFM PLG(PM)] Request : " + Base_URL)
+        log("Request : " + Base_URL)
         WebHTML = WebSock.read().decode('utf-8')
         WebSock.close()
 
@@ -144,17 +144,17 @@ class MyPlayer( xbmc.Player ) :
             countTracks = len(similarTracks)
         if(self.mode == "Top tracks of similar artist" or (self.mode == "Custom" and countTracks < 10)):
             similarArtists = self.fetch_similarArtists(currentlyPlayingArtist)
-            log("[LFM PLG(PM)] Nb Similar Artists : " + str(len(similarArtists)))
+            log("Nb Similar Artists : " + str(len(similarArtists)))
             for similarArtistName, mbid, matchValue in similarArtists:
                 if not mbid:
-                    log("[LFM PLG(PM)] Skipping " + similarArtistName + " - no mbid")
+                    log("Skipping " + similarArtistName + " - no mbid")
                     continue
                 if self.find_Artist(similarArtistName):
                     similarTracks += self.fetch_topTracksOfArtist(mbid)
 
         foundArtists = []
         countTracks = len(similarTracks)
-        log("[LFM PLG(PM)] Count: " + str(countTracks))
+        log("Count: " + str(countTracks))
 
         random.shuffle(similarTracks)
         selectedArtist = []
@@ -195,12 +195,12 @@ class MyPlayer( xbmc.Player ) :
                     year = int(item["year"])
                     if(artist not in selectedArtist):
                         selectedArtist.append(artist)
-                        log("[LFM PLG(PM)] Found: " + str(trackTitle) + " by: " + str(artist))
+                        log("Found: " + str(trackTitle) + " by: " + str(artist))
                         if (self.allowtrackrepeat == "true" or (trackPath not in self.addedTracks)):
                             if (self.preferdifferentartist != "true" or similarArtistName not in foundArtists):
                                 listitem = self.getListItem(trackTitle,artist,album,thumb,fanart,duration,year,genre)
                                 xbmc.PlayList(0).add(url=trackPath, listitem=listitem)
-                                log("[LFM PLG(PM)] Add track : " + str(trackTitle) + " by: " + str(artist))
+                                log("Add track : " + str(trackTitle) + " by: " + str(artist))
                                 self.addedTracks += [trackPath]
                                 xbmc.executebuiltin("Container.Refresh")
                                 self.countFoundTracks += 1
@@ -212,14 +212,14 @@ class MyPlayer( xbmc.Player ) :
 
         if (self.countFoundTracks == 0):
             time.sleep(3)
-            log("[LFM PLG(PM)] None found")
+            log("None found")
             xbmc.executebuiltin("Notification(" + self.SCRIPT_NAME+",No similar tracks were found)")
             return False
 
         xbmc.executebuiltin('SetCurrentPlaylist(0)')
 
     def getListItem(self, trackTitle, artist, album, thumb, fanart, duration, year, genre):
-        log("getListItem started")
+        #log("getListItem started")
         listitem = xbmcgui.ListItem(trackTitle)
         if (fanart == ""):
             cache_name = xbmc.getCacheThumbName( str(artist) )
@@ -227,12 +227,10 @@ class MyPlayer( xbmc.Player ) :
         listitem.setProperty('fanart_image',fanart)
         listitem.setInfo('music', { 'title': trackTitle, 'artist': artist, 'album': album, 'duration': duration, 'year': year, 'genre': genre, 'tracknumber': 0 })
         listitem.setArt({ 'thumb' : thumb, 'fanart' : fanart})
-        log("[LFM PLG(PM)] Fanart:%s" % fanart)
-        log("[LFM PLG(PM)] Thumb:%s" % thumb)
         return listitem
 
 def addauto(newentry, scriptcode):
-    log("addauto started")
+    #log("addauto started")
     autoexecfile = xbmcvfs.translatePath('special://home/userdata/autoexec.py')
     if exists(autoexecfile):
         with open(autoexecfile) as fh:
@@ -255,7 +253,7 @@ def addauto(newentry, scriptcode):
             f.write(newentry + "#" + scriptcode + "\n")
 
 def removeauto(scriptcode):
-    log("removeauto started")
+    #log("removeauto started")
     autoexecfile = xbmcvfs.translatePath('special://home/userdata/autoexec.py')
     if exists(autoexecfile):
         with open(autoexecfile) as fh:

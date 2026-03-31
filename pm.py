@@ -136,11 +136,20 @@ class MyPlayer( xbmc.Player ) :
         similarTracks = [x for x in similarTracks if float(x[2]) > (float(self.minimalmatching)/100.0)]
         return similarTracks
 
+    def clean_title_for_search(self, title):
+        # Strip live/remaster suffixes that Last.fm doesn't index
+        title = re.sub(r'\s*[\(\[]\s*(live[^\)\]]*|remaster(?:ed)?[^\)\]]*|\d{4}\s*remaster(?:ed)?)\s*[\)\]]', '', title, flags=re.IGNORECASE)
+        title = re.sub(r'\s*-\s*(remaster(?:ed)?(\s+\d{4})?|\d{4}\s+remaster(?:ed)?)$', '', title, flags=re.IGNORECASE)
+        return title.strip()
+
     def main_similarTracks( self, currentlyPlayingTitle, currentlyPlayingArtist ):
+        searchTitle = self.clean_title_for_search(currentlyPlayingTitle)
+        if searchTitle != currentlyPlayingTitle:
+            log("Cleaned title for search: " + searchTitle)
         countTracks = 0
         similarTracks = []
         if(self.mode == "Similar tracks" or self.mode == "Custom"):
-            similarTracks += self.fetch_similarTracks(currentlyPlayingTitle, currentlyPlayingArtist)
+            similarTracks += self.fetch_similarTracks(searchTitle, currentlyPlayingArtist)
             countTracks = len(similarTracks)
         if(self.mode == "Top tracks of similar artist" or (self.mode == "Custom" and countTracks < 10)):
             similarArtists = self.fetch_similarArtists(currentlyPlayingArtist)

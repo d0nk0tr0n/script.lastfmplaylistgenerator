@@ -205,7 +205,7 @@ class MyPlayer( xbmc.Player ) :
             cache_name = xbmc.getCacheThumbName( str(artist) )
             fanart = "special://profile/thumbnails/Music/%s/%s" % ( "Fanart", cache_name, )
         listitem.setProperty('fanart_image',fanart)
-        listitem.setInfo('music', { 'title': trackTitle, 'artist': artist, 'album': album, 'duration': duration, 'year': year, 'genre': genre })
+        listitem.setInfo('music', { 'title': trackTitle, 'artist': artist, 'album': album, 'duration': duration, 'year': year, 'genre': genre, 'tracknumber': 0 })
         listitem.setArt({ 'thumb' : thumb, 'fanart' : fanart})
         log("[LFM PLG(PM)] Fanart:%s" % fanart)
         log("[LFM PLG(PM)] Thumb:%s" % thumb)

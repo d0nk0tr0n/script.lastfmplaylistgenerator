@@ -137,6 +137,8 @@ class MyPlayer( xbmc.Player ) :
         return similarTracks
 
     def clean_title_for_search(self, title):
+        # Normalize smart quotes to straight quotes
+        title = title.replace('\u2018', "'").replace('\u2019', "'").replace('\u201c', '"').replace('\u201d', '"')
         # Strip live/remaster suffixes that Last.fm doesn't index
         title = re.sub(r'\s*[\(\[]\s*(live[^\)\]]*|remaster(?:ed)?[^\)\]]*|\d{4}\s*remaster(?:ed)?)\s*[\)\]]', '', title, flags=re.IGNORECASE)
         title = re.sub(r'\s*-\s*(remaster(?:ed)?(\s+\d{4})?|\d{4}\s+remaster(?:ed)?)$', '', title, flags=re.IGNORECASE)

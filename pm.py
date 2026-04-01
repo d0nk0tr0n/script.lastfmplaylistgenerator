@@ -222,8 +222,8 @@ class MyPlayer( xbmc.Player ) :
             else:
                 log("Not in library: " + similarTrackName + " - " + similarArtistName)
 
-                if (self.countFoundTracks >= self.numberoftrackstoadd):
-                    break
+            if (self.countFoundTracks >= self.numberoftrackstoadd):
+                break
 
         if (self.countFoundTracks == 0):
             time.sleep(3)

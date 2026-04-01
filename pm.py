@@ -208,8 +208,6 @@ class MyPlayer( xbmc.Player ) :
                     if(artist not in selectedArtist):
                         selectedArtist.append(artist)
                         log("Found: " + str(trackTitle) + " by: " + str(artist))
-                    else:
-                        log("Skipping - artist already seen: " + str(artist))
                         if (self.allowtrackrepeat == "true" or (trackPath not in self.addedTracks)):
                             if (self.preferdifferentartist != "true" or similarArtistName not in foundArtists):
                                 listitem = self.getListItem(trackTitle,artist,album,thumb,fanart,duration,year,genre)
@@ -224,6 +222,8 @@ class MyPlayer( xbmc.Player ) :
                                 log("Skipping - artist already added: " + similarArtistName)
                         else:
                             log("Skipping - repeat track: " + str(trackTitle))
+                    else:
+                        log("Skipping - artist already seen: " + str(artist))
             else:
                 log("Not in library: " + similarTrackName + " - " + similarArtistName)
 

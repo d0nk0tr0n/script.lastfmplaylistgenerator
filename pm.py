@@ -11,6 +11,7 @@ import urllib.request
 import urllib.parse
 import re
 import html
+import unicodedata
 import json as simplejson
 from os.path import exists
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
@@ -136,9 +137,19 @@ class MyPlayer( xbmc.Player ) :
         similarTracks = [x for x in similarTracks if float(x[2]) > (float(self.minimalmatching)/100.0)]
         return similarTracks
 
-    def clean_title_for_search(self, title):
+    def normalize_for_search(self, text):
+        text = html.unescape(text)
         # Normalize smart quotes to straight quotes
-        title = title.replace('\u2018', "'").replace('\u2019', "'").replace('\u201c', '"').replace('\u201d', '"')
+        text = text.replace('\u2018', "'").replace('\u2019', "'").replace('\u201c', '"').replace('\u201d', '"')
+        # Normalize fancy dashes to hyphens
+        text = text.replace('\u2010', '-').replace('\u2011', '-').replace('\u2012', '-').replace('\u2013', '-').replace('\u2014', '-')
+        # Strip diacritics
+        text = unicodedata.normalize('NFD', text)
+        text = ''.join(c for c in text if unicodedata.category(c) != 'Mn')
+        return text
+
+    def clean_title_for_search(self, title):
+        title = self.normalize_for_search(title)
         # Strip live/remaster suffixes that Last.fm doesn't index
         title = re.sub(r'\s*[\(\[]\s*(live[^\)\]]*|remaster(?:ed)?[^\)\]]*|\d{4}\s*remaster(?:ed)?)\s*[\)\]]', '', title, flags=re.IGNORECASE)
         title = re.sub(r'\s*-\s*(remaster(?:ed)?(\s+\d{4})?|\d{4}\s+remaster(?:ed)?)$', '', title, flags=re.IGNORECASE)
@@ -160,7 +171,7 @@ class MyPlayer( xbmc.Player ) :
                 if not mbid:
                     log("Skipping " + similarArtistName + " - no mbid")
                     continue
-                if self.find_Artist(similarArtistName):
+                if self.find_Artist(self.normalize_for_search(similarArtistName)):
                     similarTracks += self.fetch_topTracksOfArtist(mbid)
 
         foundArtists = []
@@ -173,6 +184,7 @@ class MyPlayer( xbmc.Player ) :
             similarTrackName = html.unescape(similarTrackName)
             similarArtistName = html.unescape(similarArtistName)
             searchTrackName = self.clean_title_for_search(similarTrackName)
+            searchArtistName = self.normalize_for_search(similarArtistName)
             if searchTrackName != similarTrackName:
                 log("Cleaned similar track title for search: " + searchTrackName)
             log("Looking for: " + similarTrackName + " - " + similarArtistName + " - " + matchValue + "/" + playCount)
@@ -181,7 +193,7 @@ class MyPlayer( xbmc.Player ) :
                 "jsonrpc": "2.0", "method": "AudioLibrary.GetSongs",
                 "params": {"properties": props, "limits": {"end": 1}, "sort": {"method": "random"},
                            "filter": {"and": [{"field": "title", "operator": "is", "value": searchTrackName},
-                                              {"field": "artist", "operator": "is", "value": similarArtistName}]}},
+                                              {"field": "artist", "operator": "is", "value": searchArtistName}]}},
                 "id": 1}))
             json_response = simplejson.loads(json_query)
             if not('result' in json_response) or json_response['result'] == None or not('songs' in json_response['result']):
@@ -189,7 +201,7 @@ class MyPlayer( xbmc.Player ) :
                     "jsonrpc": "2.0", "method": "AudioLibrary.GetSongs",
                     "params": {"properties": props, "limits": {"end": 1}, "sort": {"method": "random"},
                                "filter": {"and": [{"field": "title", "operator": "contains", "value": searchTrackName},
-                                                  {"field": "artist", "operator": "contains", "value": similarArtistName}]}},
+                                                  {"field": "artist", "operator": "contains", "value": searchArtistName}]}},
                     "id": 1}))
                 json_response = simplejson.loads(json_query)
 

@@ -34,7 +34,7 @@ class MyPlayer( xbmc.Player ) :
     numberoftrackstoadd = ( 1, 2, 3, 5, 10, )[ int( __settings__.getSetting( "numberoftrackstoadd" ) ) ]
     delaybeforesearching= ( 2, 5, 10, 30, )[ int( __settings__.getSetting( "delaybeforesearching" ) ) ]
     limitlastfmresult= ( 50, 100, 250, )[ int( __settings__.getSetting( "limitlastfmresult" ) ) ]
-    minimalplaycount= ( 50, 100, 250, 500, )[ int( __settings__.getSetting( "minimalplaycount" ) ) ]
+    minimalplaycount= ( 1000, 10000, 50000, 100000, 250000, 500000, 1000000, )[ int( __settings__.getSetting( "minimalplaycount" ) ) ]
     minimalmatching= ( 1, 2, 5, 10, 20, )[ int( __settings__.getSetting( "minimalmatching" ) ) ]
     mode= ( "Similar tracks", "Top tracks of similar artist", "Custom", )[ int(__settings__.getSetting( "mode" ) ) ]
     timer = None

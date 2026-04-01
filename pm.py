@@ -170,12 +170,15 @@ class MyPlayer( xbmc.Player ) :
         for similarTrackName, playCount, matchValue, similarArtistName in similarTracks:
             similarTrackName = html.unescape(similarTrackName)
             similarArtistName = html.unescape(similarArtistName)
+            searchTrackName = self.clean_title_for_search(similarTrackName)
+            if searchTrackName != similarTrackName:
+                log("Cleaned similar track title for search: " + searchTrackName)
             log("Looking for: " + similarTrackName + " - " + similarArtistName + " - " + matchValue + "/" + playCount)
             props = ["title", "artist", "album", "file", "thumbnail", "duration", "fanart", "year", "genre"]
             json_query = xbmc.executeJSONRPC(simplejson.dumps({
                 "jsonrpc": "2.0", "method": "AudioLibrary.GetSongs",
                 "params": {"properties": props, "limits": {"end": 1}, "sort": {"method": "random"},
-                           "filter": {"and": [{"field": "title", "operator": "is", "value": similarTrackName},
+                           "filter": {"and": [{"field": "title", "operator": "is", "value": searchTrackName},
                                               {"field": "artist", "operator": "is", "value": similarArtistName}]}},
                 "id": 1}))
             json_response = simplejson.loads(json_query)
@@ -183,7 +186,7 @@ class MyPlayer( xbmc.Player ) :
                 json_query = xbmc.executeJSONRPC(simplejson.dumps({
                     "jsonrpc": "2.0", "method": "AudioLibrary.GetSongs",
                     "params": {"properties": props, "limits": {"end": 1}, "sort": {"method": "random"},
-                               "filter": {"and": [{"field": "title", "operator": "contains", "value": similarTrackName},
+                               "filter": {"and": [{"field": "title", "operator": "contains", "value": searchTrackName},
                                                   {"field": "artist", "operator": "contains", "value": similarArtistName}]}},
                     "id": 1}))
                 json_response = simplejson.loads(json_query)
@@ -205,6 +208,8 @@ class MyPlayer( xbmc.Player ) :
                     if(artist not in selectedArtist):
                         selectedArtist.append(artist)
                         log("Found: " + str(trackTitle) + " by: " + str(artist))
+                    else:
+                        log("Skipping - artist already seen: " + str(artist))
                         if (self.allowtrackrepeat == "true" or (trackPath not in self.addedTracks)):
                             if (self.preferdifferentartist != "true" or similarArtistName not in foundArtists):
                                 listitem = self.getListItem(trackTitle,artist,album,thumb,fanart,duration,year,genre)

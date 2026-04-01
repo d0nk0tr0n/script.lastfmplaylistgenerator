@@ -170,12 +170,17 @@ class MyPlayer( xbmc.Player ) :
         if(self.mode == "Top tracks of similar artist" or (self.mode == "Custom" and countTracks < 10)):
             similarArtists = self.fetch_similarArtists(currentlyPlayingArtist)
             log("Nb Similar Artists : " + str(len(similarArtists)))
+            artistFetchCount = 0
             for similarArtistName, mbid, matchValue in similarArtists:
+                if artistFetchCount >= 5:
+                    log("Reached similar artist fetch cap")
+                    break
                 if not mbid:
                     log("Skipping " + similarArtistName + " - no mbid")
                     continue
                 if self.find_Artist(self.normalize_for_search(similarArtistName)):
                     similarTracks += self.fetch_topTracksOfArtist(mbid)
+                    artistFetchCount += 1
 
         foundArtists = []
         countTracks = len(similarTracks)

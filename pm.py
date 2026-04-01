@@ -153,6 +153,9 @@ class MyPlayer( xbmc.Player ) :
         # Strip live/remaster suffixes that Last.fm doesn't index
         title = re.sub(r'\s*[\(\[]\s*(live[^\)\]]*|remaster(?:ed)?[^\)\]]*|\d{4}\s*remaster(?:ed)?)\s*[\)\]]', '', title, flags=re.IGNORECASE)
         title = re.sub(r'\s*-\s*(remaster(?:ed)?(\s+\d{4})?|\d{4}\s+remaster(?:ed)?)$', '', title, flags=re.IGNORECASE)
+        # Strip featuring suffixes that Last.fm doesn't include in track titles
+        title = re.sub(r'\s*[\(\[]\s*(?:featuring|feat\.?|ft\.?)\s+[^\)\]]+[\)\]]', '', title, flags=re.IGNORECASE)
+        title = re.sub(r'\s*-\s*(?:featuring|feat\.?|ft\.?)\s+.+$', '', title, flags=re.IGNORECASE)
         return title.strip()
 
     def main_similarTracks( self, currentlyPlayingTitle, currentlyPlayingArtist ):
@@ -187,7 +190,7 @@ class MyPlayer( xbmc.Player ) :
             searchArtistName = self.normalize_for_search(similarArtistName)
             if searchTrackName != similarTrackName:
                 log("Cleaned similar track title for search: " + searchTrackName)
-            log("Looking for: " + similarTrackName + " - " + similarArtistName + " - " + matchValue + "/" + playCount)
+            log("Looking for: " + similarTrackName + " - " + similarArtistName + " - " + playCount + "/" + matchValue)
             props = ["title", "artist", "album", "file", "thumbnail", "duration", "fanart", "year", "genre"]
             json_query = xbmc.executeJSONRPC(simplejson.dumps({
                 "jsonrpc": "2.0", "method": "AudioLibrary.GetSongs",

@@ -279,7 +279,6 @@ class MyPlayer( xbmc.Player ) :
         xbmc.executebuiltin('SetCurrentPlaylist(0)')
 
     def getListItem(self, trackTitle, artist, album, thumb, fanart, duration, year, genre):
-        #log("getListItem started")
         listitem = xbmcgui.ListItem(trackTitle)
         if (fanart == ""):
             cache_name = xbmc.getCacheThumbName( str(artist) )
@@ -290,7 +289,6 @@ class MyPlayer( xbmc.Player ) :
         return listitem
 
 def addauto(newentry, scriptcode):
-    #log("addauto started")
     autoexecfile = xbmcvfs.translatePath('special://home/userdata/autoexec.py')
     if exists(autoexecfile):
         with open(autoexecfile) as fh:
@@ -313,7 +311,6 @@ def addauto(newentry, scriptcode):
             f.write(newentry + "#" + scriptcode + "\n")
 
 def removeauto(scriptcode):
-    #log("removeauto started")
     autoexecfile = xbmcvfs.translatePath('special://home/userdata/autoexec.py')
     if exists(autoexecfile):
         with open(autoexecfile) as fh:

@@ -188,11 +188,17 @@ class MyPlayer( xbmc.Player ) :
 
         random.shuffle(similarTracks)
         selectedArtist = []
+        artistExistsCache = {}
         for similarTrackName, playCount, matchValue, similarArtistName in similarTracks:
             similarTrackName = html.unescape(similarTrackName)
             similarArtistName = html.unescape(similarArtistName)
             searchTrackName = self.clean_title_for_search(similarTrackName)
             searchArtistName = self.normalize_for_search(similarArtistName)
+            if searchArtistName not in artistExistsCache:
+                artistExistsCache[searchArtistName] = self.find_Artist(searchArtistName)
+            if not artistExistsCache[searchArtistName]:
+                log("Artist not in library, skipping: " + searchArtistName)
+                continue
             if searchTrackName != similarTrackName:
                 log("Cleaned similar track title for search: " + searchTrackName)
             log("Looking for: " + similarTrackName + " - " + similarArtistName + " - " + playCount + "/" + matchValue)
@@ -221,15 +227,16 @@ class MyPlayer( xbmc.Player ) :
                     "id": 1}))
                 json_response = simplejson.loads(json_query)
             if not('result' in json_response) or json_response['result'] == None or not('songs' in json_response['result']):
-                smartTrackName = searchTrackName.replace("'", "\u2019").replace('"', "\u201d").replace('-', "\u2010")
-                smartArtistName = searchArtistName.replace("'", "\u2019").replace('"', "\u201d").replace('-', "\u2010")
-                json_query = xbmc.executeJSONRPC(simplejson.dumps({
-                    "jsonrpc": "2.0", "method": "AudioLibrary.GetSongs",
-                    "params": {"properties": props, "limits": {"end": 1}, "sort": {"method": "random"},
-                               "filter": {"and": [{"field": "title", "operator": "contains", "value": smartTrackName},
-                                                  {"field": "artist", "operator": "contains", "value": smartArtistName}]}},
-                    "id": 1}))
-                json_response = simplejson.loads(json_query)
+                if any(c in searchTrackName + searchArtistName for c in ("'", '"', '-')):
+                    smartTrackName = searchTrackName.replace("'", "\u2019").replace('"', "\u201d").replace('-', "\u2010")
+                    smartArtistName = searchArtistName.replace("'", "\u2019").replace('"', "\u201d").replace('-', "\u2010")
+                    json_query = xbmc.executeJSONRPC(simplejson.dumps({
+                        "jsonrpc": "2.0", "method": "AudioLibrary.GetSongs",
+                        "params": {"properties": props, "limits": {"end": 1}, "sort": {"method": "random"},
+                                   "filter": {"and": [{"field": "title", "operator": "contains", "value": smartTrackName},
+                                                      {"field": "artist", "operator": "contains", "value": smartArtistName}]}},
+                        "id": 1}))
+                    json_response = simplejson.loads(json_query)
 
             # separate the records
             if 'result' in json_response and json_response['result'] != None and 'songs' in json_response['result']:

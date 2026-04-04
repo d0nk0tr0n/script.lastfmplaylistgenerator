@@ -163,13 +163,16 @@ class MyPlayer( xbmc.Player ) :
         searchTitle = self.clean_title_for_search(currentlyPlayingTitle)
         if searchTitle != currentlyPlayingTitle:
             log("Cleaned title for search: " + searchTitle)
+        searchArtist = self.normalize_for_search(currentlyPlayingArtist)
+        if searchArtist != currentlyPlayingArtist:
+            log("Cleaned artist for search: " + searchArtist)
         countTracks = 0
         similarTracks = []
         if(self.mode == "Similar tracks" or self.mode == "Custom"):
-            similarTracks += self.fetch_similarTracks(searchTitle, currentlyPlayingArtist)
+            similarTracks += self.fetch_similarTracks(searchTitle, searchArtist)
             countTracks = len(similarTracks)
         if(self.mode == "Top tracks of similar artist" or (self.mode == "Custom" and countTracks < 10)):
-            similarArtists = self.fetch_similarArtists(currentlyPlayingArtist)
+            similarArtists = self.fetch_similarArtists(searchArtist)
             log("Nb Similar Artists : " + str(len(similarArtists)))
             artistFetchCount = 0
             for similarArtistName, mbid, matchValue in similarArtists:

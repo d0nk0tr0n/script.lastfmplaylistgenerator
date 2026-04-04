@@ -16,8 +16,9 @@ import json as simplejson
 from os.path import exists
 import xbmc, xbmcgui, xbmcaddon, xbmcvfs
 
-__settings__ = xbmcaddon.Addon(id='script.lastfmplaylistgeneratorPM')
-__cwd__      = __settings__.getAddonInfo('path')
+__settings__      = xbmcaddon.Addon(id='script.lastfmplaylistgeneratorPM')
+__cwd__           = __settings__.getAddonInfo('path')
+__addonversion__  = __settings__.getAddonInfo('version')
 
 def log(txt):
     message = '%s: %s' % ("[ADDON LFM]", txt)
@@ -42,7 +43,7 @@ class MyPlayer( xbmc.Player ) :
     apiPath = "http://ws.audioscrobbler.com/2.0/?api_key=3ae834eee073c460a250ee08979184ec"
 
     def __init__ ( self ):
-        log("__init__ started")
+        log("__init__ started v" + __addonversion__)
         xbmc.Player.__init__( self )
         xbmc.PlayList(0).clear()
         self.firstRun = 1

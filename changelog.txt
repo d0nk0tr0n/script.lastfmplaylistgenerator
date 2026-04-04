@@ -1,12 +1,35 @@
-1.4.0-beta.3
-- version sync
-
-1.4.0-beta.1
-- Major changes and modernizations. Summary to follow
-
-1.3.1.3
-- Fixed: removed commented and dead code calls in pm.py.
-- Fixed: optimized default.py
+1.4.0
+- Fixed: html.unescape() applied consistently to all artist and track names
+    from Last.fm to handle XML entities like &amp; and &quot;
+- Fixed: unicode diacritic stripping and smart quote normalization applied
+    to both track titles and artist names before library search
+- Fixed: featuring suffixes (feat., ft., featuring) stripped from track
+    titles before querying Last.fm so seeding tracks with collabs return results
+- Fixed: live and remaster suffixes stripped from track titles before search
+- Fixed: four-tier library search fallback - exact normalized, contains
+    normalized, contains original, contains smart-quote reversed
+- Fixed: artist existence cached per search run - artists not in the library
+    are skipped without querying all their tracks (major speed improvement)
+- Fixed: similar artist API calls capped at 5 to prevent runaway requests
+    when seeding from tracks with many similar artists not in the library
+- Fixed: JSON-RPC queries now built with simplejson.dumps() instead of
+    string interpolation, preventing injection from special characters in names
+- Fixed: addedTracks type consistency - was mixing str and bytes, causing
+    repeat track detection to silently fail
+- Fixed: monitor loop rewritten using xbmc.Monitor correctly
+- Fixed: xbmcvfs.translatePath used throughout instead of deprecated
+    xbmc.translatePath
+- Fixed: all file handles use with blocks
+- Changed: minimalplaycount range updated to 1k/10k/50k/100k/250k/500k/1M,
+    default 100,000
+- Changed: log prefix standardized to [ADDON LFM]
+- Changed: addon version logged at startup
+- Changed: .gitattributes cleaned up for Kodi addon packaging (export-ignore)
+- Added: check_normalization.sh utility for auditing Kodi music database
+    for unicode/diacritic mismatches, supports SQLite and MySQL
+- Added: addon shown under Music and Programs in Kodi
+- Removed: dead code (fetch_searchTrack, unicode_normalize_string, dbtype
+    detection, commented-out Python 2 remnants)
 
 1.3.1.2
 - Fixed: set thumbnail for initial item in playlist

@@ -60,6 +60,8 @@ class MyPlayer( xbmc.Player ) :
         if xbmc.Player().isPlayingAudio():
             currentlyPlayingTitle = xbmc.Player().getMusicInfoTag().getTitle()
             currentlyPlayingArtist = xbmc.Player().getMusicInfoTag().getArtist()
+            currentlyPlayingTrackMbid = xbmc.Player().getMusicInfoTag().getMusicBrainzTrackID()
+            currentlyPlayingArtistMbid = xbmc.Player().getMusicInfoTag().getMusicBrainzArtistID()
             log(currentlyPlayingArtist + " - " + currentlyPlayingTitle + " started playing")
             self.countFoundTracks = 0
             if (self.firstRun == 1):
@@ -78,7 +80,7 @@ class MyPlayer( xbmc.Player ) :
                 xbmc.Player().updateInfoTag(listitem)
                 self.addedTracks += [xbmc.Player().getMusicInfoTag().getURL()]
             log("main_similarTracks stopping next")
-            self.main_similarTracks(currentlyPlayingTitle,currentlyPlayingArtist)
+            self.main_similarTracks(currentlyPlayingTitle, currentlyPlayingArtist, currentlyPlayingTrackMbid, currentlyPlayingArtistMbid)
 
     def onPlayBackStarted(self):
         log("onPlayBackStarted waiting:  " + str(self.delaybeforesearching) +" seconds")
@@ -88,10 +90,13 @@ class MyPlayer( xbmc.Player ) :
         self.timer = threading.Timer(self.delaybeforesearching,self.startPlayBack)
         self.timer.start()
 
-    def fetch_similarArtists( self, currentlyPlayingArtist ):
+    def fetch_similarArtists( self, currentlyPlayingArtist, mbid="" ):
         apiMethod = "&method=artist.getsimilar&limit=50&autocorrect=1"
 
-        Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist)
+        if mbid:
+            Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(mbid)
+        else:
+            Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist)
         WebSock = urllib.request.urlopen(Base_URL)
         log("Request : " + Base_URL)
         WebHTML = WebSock.read().decode('utf-8')
@@ -125,10 +130,13 @@ class MyPlayer( xbmc.Player ) :
         topTracks.sort(key=lambda x: int(x[2]), reverse=True)
         return topTracks
 
-    def fetch_similarTracks( self, currentlyPlayingTitle, currentlyPlayingArtist ):
+    def fetch_similarTracks( self, currentlyPlayingTitle, currentlyPlayingArtist, mbid="" ):
         apiMethod = "&method=track.getsimilar&limit=" + str(self.limitlastfmresult) + "&autocorrect=1"
 
-        Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist) + "&track=" + urllib.parse.quote_plus(currentlyPlayingTitle)
+        if mbid:
+            Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(mbid)
+        else:
+            Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist) + "&track=" + urllib.parse.quote_plus(currentlyPlayingTitle)
         WebSock = urllib.request.urlopen(Base_URL)
         log("Request : " + Base_URL)
         WebHTML = WebSock.read().decode('utf-8')
@@ -160,7 +168,7 @@ class MyPlayer( xbmc.Player ) :
         title = re.sub(r'\s*-\s*(?:featuring|feat\.?|ft\.?)\s+.+$', '', title, flags=re.IGNORECASE)
         return title.strip()
 
-    def main_similarTracks( self, currentlyPlayingTitle, currentlyPlayingArtist ):
+    def main_similarTracks( self, currentlyPlayingTitle, currentlyPlayingArtist, trackMbid="", artistMbid="" ):
         searchTitle = self.clean_title_for_search(currentlyPlayingTitle)
         if searchTitle != currentlyPlayingTitle:
             log("Cleaned title for search: " + searchTitle)
@@ -170,10 +178,10 @@ class MyPlayer( xbmc.Player ) :
         countTracks = 0
         similarTracks = []
         if(self.mode == "Similar tracks" or self.mode == "Custom"):
-            similarTracks += self.fetch_similarTracks(searchTitle, searchArtist)
+            similarTracks += self.fetch_similarTracks(searchTitle, searchArtist, trackMbid)
             countTracks = len(similarTracks)
         if(self.mode == "Top tracks of similar artist" or (self.mode == "Custom" and countTracks < 10)):
-            similarArtists = self.fetch_similarArtists(searchArtist)
+            similarArtists = self.fetch_similarArtists(searchArtist, artistMbid)
             log("Nb Similar Artists : " + str(len(similarArtists)))
             artistFetchCount = 0
             for similarArtistName, mbid, matchValue in similarArtists:

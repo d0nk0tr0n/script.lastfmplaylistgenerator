@@ -1,3 +1,10 @@
+1.4.1
+- Fixed: artist existence cached per search run - artists not in the library
+    are skipped after one lookup, eliminating up to four track queries per
+    repeated missing artist (major speed improvement for large similar-track lists)
+- Fixed: smart-quote fallback search (tier 4) skipped when track and artist
+    names contain no ', ", or - characters
+
 1.4.0
 - Fixed: html.unescape() applied consistently to all artist and track names
     from Last.fm to handle XML entities like &amp; and &quot;
@@ -63,7 +70,7 @@
 - Fixed: Removed unnecessary dependency check
 
 1.1.3
-- Fixed: Stopped after first run. 
+- Fixed: Stopped after first run.
 
 1.1.2
 - Changed: Move plugin to Music's addon section
@@ -103,7 +110,7 @@
 	Prefer different artist
 	Number of tracks to add
 	Dealy before searching
-	
+
 1.0.4
 - Added: Add artist fanart to the listitem
 - Changed: Randomize last.fm result

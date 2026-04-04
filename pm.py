@@ -94,9 +94,9 @@ class MyPlayer( xbmc.Player ) :
         apiMethod = "&method=artist.getsimilar&limit=50&autocorrect=1"
 
         if mbid:
-            Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(mbid)
+            Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(str(mbid))
         else:
-            Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist)
+            Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(searchArtist)
         WebSock = urllib.request.urlopen(Base_URL)
         log("Request : " + Base_URL)
         WebHTML = WebSock.read().decode('utf-8')

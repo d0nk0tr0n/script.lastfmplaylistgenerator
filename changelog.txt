@@ -1,12 +1,37 @@
-1.4.0-beta.3
-- version sync
+1.4.1
+- Fixed: artist existence cached per search run - artists not in the library
+    are skipped after one lookup, eliminating up to four track queries per
+    repeated missing artist (major speed improvement for large similar-track lists)
+- Fixed: smart-quote fallback search (tier 4) skipped when track and artist
+    names contain no ', ", or - characters
 
-1.4.0-beta.1
-- Major changes and modernizations. Summary to follow
-
-1.3.1.3
-- Fixed: removed commented and dead code calls in pm.py.
-- Fixed: optimized default.py
+1.4.0
+- Fixed: html.unescape() applied to all artist and track names from Last.fm
+    to handle XML entities like &amp; and &quot;
+- Fixed: unicode diacritic stripping and smart quote normalization applied
+    to both track titles and artist names before library search
+- Fixed: featuring suffixes (feat., ft., featuring) stripped from track
+    titles before querying Last.fm so seeding tracks with collabs return results
+- Fixed: live and remaster suffixes stripped from track titles before search
+- Fixed: four-tier library search fallback with smart-quote variant as final tier
+- Fixed: similar artist API calls capped when tracks are not found to prevent
+    runaway requests
+- Fixed: track search loop now respects the requested song limit correctly
+- Fixed: monitor loop and script exit logic rewritten using xbmc.Monitor
+- Fixed: xbmcvfs.translatePath used throughout instead of deprecated
+    xbmc.translatePath
+- Fixed: all file handles use with blocks
+- Fixed: JSON-RPC queries built with simplejson.dumps() instead of string
+    interpolation, preventing injection from special characters in names
+- Changed: minimalplaycount range updated to 1k/10k/50k/100k/250k/500k/1M,
+    default 100,000
+- Changed: log prefix standardized to [ADDON LFM]
+- Changed: addon shown under Music and Programs in Kodi
+- Changed: Python 3.0.1 minimum requirement (Nexus and later)
+- Added: check_normalization.sh utility for auditing Kodi music database
+    for unicode/diacritic mismatches, supports SQLite and MySQL
+- Removed: dead code and unused imports (difflib, sys, unicodedata,
+    commented-out Python 2 remnants)
 
 1.3.1.2
 - Fixed: set thumbnail for initial item in playlist

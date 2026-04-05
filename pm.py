@@ -97,7 +97,7 @@ class MyPlayer( xbmc.Player ) :
         if mbid:
             Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(str(mbid))
         else:
-            Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist)
+            Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote(currentlyPlayingArtist)
         WebSock = urllib.request.urlopen(Base_URL)
         log("Request : " + Base_URL)
         WebHTML = WebSock.read().decode('utf-8')
@@ -137,7 +137,7 @@ class MyPlayer( xbmc.Player ) :
         if mbid:
             Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(mbid)
         else:
-            Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist) + "&track=" + urllib.parse.quote_plus(currentlyPlayingTitle)
+            Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote(currentlyPlayingArtist) + "&track=" + urllib.parse.quote(currentlyPlayingTitle)
         WebSock = urllib.request.urlopen(Base_URL)
         log("Request : " + Base_URL)
         WebHTML = WebSock.read().decode('utf-8')

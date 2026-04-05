@@ -60,8 +60,9 @@ class MyPlayer( xbmc.Player ) :
         if xbmc.Player().isPlayingAudio():
             currentlyPlayingTitle = xbmc.Player().getMusicInfoTag().getTitle()
             currentlyPlayingArtist = xbmc.Player().getMusicInfoTag().getArtist()
-            currentlyPlayingTrackMbid = xbmc.Player().getMusicInfoTag().getMusicBrainzTrackID()
-            currentlyPlayingArtistMbid = xbmc.Player().getMusicInfoTag().getMusicBrainzArtistID()
+            currentlyPlayingTrackMbid = xbmc.Player().getMusicInfoTag().getMusicBrainzTrackID() or ""
+            artistMbids = xbmc.Player().getMusicInfoTag().getMusicBrainzArtistID()
+            currentlyPlayingArtistMbid = artistMbids[0] if artistMbids else ""
             log(currentlyPlayingArtist + " - " + currentlyPlayingTitle + " started playing")
             self.countFoundTracks = 0
             if (self.firstRun == 1):
@@ -96,7 +97,7 @@ class MyPlayer( xbmc.Player ) :
         if mbid:
             Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(str(mbid))
         else:
-            Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(searchArtist)
+            Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist)
         WebSock = urllib.request.urlopen(Base_URL)
         log("Request : " + Base_URL)
         WebHTML = WebSock.read().decode('utf-8')

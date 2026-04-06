@@ -89,7 +89,7 @@ class MyPlayer( xbmc.Player ) :
         self.timer.start()
 
     def fetch_similarArtists( self, currentlyPlayingArtist ):
-        apiMethod = "&method=artist.getsimilar&limit=50"
+        apiMethod = "&method=artist.getsimilar&limit=50&autocorrect=1"
 
         Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist)
         WebSock = urllib.request.urlopen(Base_URL)
@@ -125,7 +125,7 @@ class MyPlayer( xbmc.Player ) :
         return topTracks
 
     def fetch_similarTracks( self, currentlyPlayingTitle, currentlyPlayingArtist ):
-        apiMethod = "&method=track.getsimilar&limit=" + str(self.limitlastfmresult)
+        apiMethod = "&method=track.getsimilar&limit=" + str(self.limitlastfmresult) + "&autocorrect=1"
 
         Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote_plus(currentlyPlayingArtist) + "&track=" + urllib.parse.quote_plus(currentlyPlayingTitle)
         WebSock = urllib.request.urlopen(Base_URL)

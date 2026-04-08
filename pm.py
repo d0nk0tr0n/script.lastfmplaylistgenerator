@@ -24,6 +24,12 @@ def log(txt):
     message = '%s: %s' % ("[ADDON LFM]", txt)
     xbmc.log(msg=message, level=xbmc.LOGWARNING)
 
+def fmt_num(n):
+    try:
+        return f"{int(n):,}"
+    except (ValueError, TypeError):
+        return str(n)
+
 class MyPlayer( xbmc.Player ) :
     countFoundTracks = 0
     addedTracks = []
@@ -32,7 +38,7 @@ class MyPlayer( xbmc.Player ) :
 
     allowtrackrepeat =  __settings__.getSetting( "allowtrackrepeat" )
     preferdifferentartist = __settings__.getSetting( "preferdifferentartist" )
-    numberoftrackstoadd = ( 1, 2, 3, 5, 10, )[ int( __settings__.getSetting( "numberoftrackstoadd" ) ) ]
+    numberoftrackstoadd = ( 1, 2, 3, 5, 10, 25, 50, )[ int( __settings__.getSetting( "numberoftrackstoadd" ) ) ]
     delaybeforesearching= ( 2, 5, 10, 30, )[ int( __settings__.getSetting( "delaybeforesearching" ) ) ]
     limitlastfmresult= ( 50, 100, 250, )[ int( __settings__.getSetting( "limitlastfmresult" ) ) ]
     minimalplaycount= ( 1000, 10000, 50000, 100000, 250000, 500000, 1000000, )[ int( __settings__.getSetting( "minimalplaycount" ) ) ]
@@ -137,7 +143,7 @@ class MyPlayer( xbmc.Player ) :
             log("fetch_topTracksOfArtist failed: " + str(e))
             return []
         topTracks = re.findall("<track rank=.+?>.*?<name>(.+?)</name>.*?<playcount>(.+?)</playcount>.*?<listeners>(.+?)</listeners>.*?<artist>.*?<name>(.+?)</name>.*?</artist>.*?</track>", WebHTML2, re.DOTALL )
-        log("Count: " + str(len(topTracks)))
+        log("Last.fm returned: " + str(len(topTracks)) + " tracks")
         topTracks = [x for x in topTracks if int(x[1]) > self.minimalplaycount]
         topTracks.sort(key=lambda x: int(x[2]), reverse=True)
         return topTracks
@@ -215,7 +221,7 @@ class MyPlayer( xbmc.Player ) :
 
         foundArtists = []
         countTracks = len(similarTracks)
-        log("Count: " + str(countTracks))
+        log("Candidates after filter: " + str(countTracks))
 
         random.shuffle(similarTracks)
         selectedArtist = []
@@ -232,7 +238,7 @@ class MyPlayer( xbmc.Player ) :
                 continue
             if searchTrackName != similarTrackName:
                 log("Cleaned similar track title for search: " + searchTrackName)
-            log("Looking for: " + similarTrackName + " - " + similarArtistName + " - " + playCount + "/" + matchValue)
+            log("Looking for: " + similarTrackName + " - " + similarArtistName + " - " + fmt_num(playCount) + "/" + fmt_num(matchValue))
             props = ["title", "artist", "album", "file", "thumbnail", "duration", "fanart", "year", "genre"]
             json_query = xbmc.executeJSONRPC(simplejson.dumps({
                 "jsonrpc": "2.0", "method": "AudioLibrary.GetSongs",

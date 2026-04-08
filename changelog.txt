@@ -1,4 +1,6 @@
 1.4.2-beta
+- Added: Greatest hits mode - queues top tracks of the currently playing
+    artist instead of finding similar tracks
 - Added: autocorrect=1 flag on Last.fm API calls - handles artist name
     mismatches like Beyonce → Beyoncé, Blue Oyster Cult → Blue Öyster Cult
 - Added: MusicBrainz artist and track IDs passed to Last.fm API calls when

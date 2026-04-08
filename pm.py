@@ -37,7 +37,7 @@ class MyPlayer( xbmc.Player ) :
     limitlastfmresult= ( 50, 100, 250, )[ int( __settings__.getSetting( "limitlastfmresult" ) ) ]
     minimalplaycount= ( 1000, 10000, 50000, 100000, 250000, 500000, 1000000, )[ int( __settings__.getSetting( "minimalplaycount" ) ) ]
     minimalmatching= ( 1, 2, 5, 10, 20, )[ int( __settings__.getSetting( "minimalmatching" ) ) ]
-    mode= ( "Similar tracks", "Top tracks of similar artist", "Custom", )[ int(__settings__.getSetting( "mode" ) ) ]
+    mode= ( "Similar tracks", "Top tracks of similar artist", "Custom", "Greatest hits", )[ int(__settings__.getSetting( "mode" ) ) ]
     timer = None
 
     apiPath = "https://ws.audioscrobbler.com/2.0/?api_key=3ae834eee073c460a250ee08979184ec"
@@ -121,10 +121,13 @@ class MyPlayer( xbmc.Player ) :
             return True
         return False
 
-    def fetch_topTracksOfArtist( self, mbIdArtist ):
-        apiMethod = "&method=artist.gettoptracks&limit=20"
+    def fetch_topTracksOfArtist( self, mbIdArtist="", artistName="" ):
+        apiMethod = "&method=artist.gettoptracks&limit=20&autocorrect=1"
 
-        Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(mbIdArtist)
+        if mbIdArtist:
+            Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(mbIdArtist)
+        else:
+            Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote(artistName)
         log("Request : " + Base_URL)
         try:
             WebSock = urllib.request.urlopen(Base_URL, timeout=10)
@@ -190,6 +193,8 @@ class MyPlayer( xbmc.Player ) :
             log("Cleaned artist for search: " + searchArtist)
         countTracks = 0
         similarTracks = []
+        if self.mode == "Greatest hits":
+            similarTracks = self.fetch_topTracksOfArtist(artistMbid, searchArtist)
         if(self.mode == "Similar tracks" or self.mode == "Custom"):
             similarTracks += self.fetch_similarTracks(searchTitle, searchArtist, trackMbid)
             countTracks = len(similarTracks)

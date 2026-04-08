@@ -1,3 +1,16 @@
+1.4.2-beta
+- Added: autocorrect=1 flag on Last.fm API calls - handles artist name
+    mismatches like Beyonce → Beyoncé, Blue Oyster Cult → Blue Öyster Cult
+- Added: MusicBrainz artist and track IDs passed to Last.fm API calls when
+    available, bypassing name matching issues entirely
+- Fixed: artist name normalized before Last.fm queries so artists stored
+    with diacritics (e.g. Līve) query correctly
+- Fixed: urllib.parse.quote used instead of quote_plus for artist/track
+    names, preserving literal + in names like Florence + The Machine
+- Fixed: getMusicBrainzArtistID() returns a list - take first element
+- Changed: top tracks of similar artist sorted by listeners after
+    playcount filter
+
 1.4.1
 - Fixed: artist existence cached per search run - artists not in the library
     are skipped after one lookup, eliminating up to four track queries per

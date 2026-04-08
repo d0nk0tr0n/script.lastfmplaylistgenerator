@@ -37,7 +37,7 @@ msgid "Limit lastfm results"
 msgstr ""
 
 msgctxt "#33005"
-msgid "Minimum number of listening on last.fm"
+msgid "Minimum scrobbles on last.fm"
 msgstr ""
 
 msgctxt "#33006"

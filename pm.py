@@ -283,11 +283,12 @@ class MyPlayer( xbmc.Player ) :
                     fanart = item["fanart"]
                     genre = item["genre"][0] if item["genre"] else ""
                     year = int(item["year"])
-                    if(artist not in selectedArtist):
-                        selectedArtist.append(artist)
+                    if(self.mode == "Greatest hits" or artist not in selectedArtist):
+                        if artist not in selectedArtist:
+                            selectedArtist.append(artist)
                         log("Found: " + str(trackTitle) + " by: " + str(artist))
                         if (self.allowtrackrepeat == "true" or (trackPath not in self.addedTracks)):
-                            if (self.preferdifferentartist != "true" or artist not in foundArtists):
+                            if (self.mode == "Greatest hits" or self.preferdifferentartist != "true" or artist not in foundArtists):
                                 listitem = self.getListItem(trackTitle,artist,album,thumb,fanart,duration,year,genre)
                                 xbmc.PlayList(0).add(url=trackPath, listitem=listitem)
                                 log("Add track : " + str(trackTitle) + " by: " + str(artist))

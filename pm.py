@@ -121,8 +121,8 @@ class MyPlayer( xbmc.Player ) :
             return True
         return False
 
-    def fetch_topTracksOfArtist( self, mbIdArtist="", artistName="" ):
-        apiMethod = "&method=artist.gettoptracks&limit=20&autocorrect=1"
+    def fetch_topTracksOfArtist( self, mbIdArtist="", artistName="", limit=20 ):
+        apiMethod = "&method=artist.gettoptracks&limit=" + str(limit) + "&autocorrect=1"
 
         if mbIdArtist:
             Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(mbIdArtist)
@@ -194,7 +194,7 @@ class MyPlayer( xbmc.Player ) :
         countTracks = 0
         similarTracks = []
         if self.mode == "Greatest hits":
-            similarTracks = self.fetch_topTracksOfArtist(artistMbid, searchArtist)
+            similarTracks = self.fetch_topTracksOfArtist(artistMbid, searchArtist, limit=50)
         if(self.mode == "Similar tracks" or self.mode == "Custom"):
             similarTracks += self.fetch_similarTracks(searchTitle, searchArtist, trackMbid)
             countTracks = len(similarTracks)

@@ -16,10 +16,14 @@ The addon supports three modes:
 
 ## Features
 
-- Unicode normalization for matching (diacritics, smart quotes, fancy dashes)
+- Last.fm autocorrect enabled — handles artist name variants (e.g. Beyonce → Beyoncé, Blue Oyster Cult → Blue Öyster Cult)
+- MusicBrainz ID used for Last.fm queries when available, bypassing name matching issues entirely
+- Unicode normalization for library matching (diacritics, smart quotes, fancy dashes)
 - HTML entity unescaping for Last.fm results
 - Strips live/remaster/featuring suffixes for better Last.fm matching
-- Multi-tier library search fallback (exact, contains, original, reverse smart quotes)
+- Artist existence cached per search run — skips all track queries for artists not in the library
+- Multi-tier library search fallback (exact, contains, normalized, smart-quote variants)
+- Top tracks of similar artists sorted by listener count
 - Configurable track repeat and artist diversity preferences
 - Single-instance enforcement via pid file
 - Caps similar artist API calls to avoid excessive Last.fm requests
@@ -35,6 +39,7 @@ The addon supports three modes:
 | Limit Last.fm results | Max results from Last.fm per query (lower = better similarity) | 50, 100, 250 |
 | Minimum listening count | Minimum Last.fm scrobbles required (higher = more popular) | 1K, 10K, 50K, 100K, 250K, 500K, 1M |
 | Minimum percentage similarity | Similarity threshold for track matching | 1%, 2%, 5%, 10%, 20% |
+| Search mode | Strategy for finding similar tracks | Similar tracks, Top tracks of similar artist, Custom |
 
 ## Requirements
 

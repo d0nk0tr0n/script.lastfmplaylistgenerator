@@ -9,19 +9,19 @@ flowchart TD
     D --> E[clean title: strip live/remaster/feat, normalize diacritics]
 
     E --> F{mode?}
-    F -->|Similar tracks or Custom| G[track.getsimilar → filter by minimalplaycount + minimalmatching]
+    F -->|Similar tracks or Custom| G[track.getsimilar with autocorrect=1<br/>use track mbid if available<br/>filter by minimalplaycount + minimalmatching]
     G --> H{Custom and count < 10?}
     F -->|Top tracks of similar artist| I
-    H -->|Yes| I[artist.getsimilar → filter by minimalmatching]
+    H -->|Yes| I[artist.getsimilar with autocorrect=1<br/>use artist mbid if available<br/>filter by minimalmatching]
     H -->|No| J
     I --> I2[for each similar artist, max 5<br/>check mbid exists<br/>check artist in library<br/>artist.gettoptracks → filter playcount, sort by listeners]
     I2 --> J
 
     J[shuffle combined track list] --> K
 
-    K[/next candidate track/] --> L{artist in library?\ncached lookup}
+    K[/next candidate track/] --> L{artist in library?<br/>cached lookup}
     L -->|No| K
-    L -->|Yes| M[Tier 1: title IS + artist IS]
+    L -->|Yes| M[Tier 1: title IS + artist IS, normalized]
     M -->|miss| N[Tier 2: title contains + artist contains, normalized]
     N -->|miss| O[Tier 3: title contains + artist contains, original]
     O -->|miss| P{has apostrophe<br/>quote or dash?}

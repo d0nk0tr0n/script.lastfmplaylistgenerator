@@ -40,7 +40,7 @@ class MyPlayer( xbmc.Player ) :
     mode= ( "Similar tracks", "Top tracks of similar artist", "Custom", )[ int(__settings__.getSetting( "mode" ) ) ]
     timer = None
 
-    apiPath = "http://ws.audioscrobbler.com/2.0/?api_key=3ae834eee073c460a250ee08979184ec"
+    apiPath = "https://ws.audioscrobbler.com/2.0/?api_key=3ae834eee073c460a250ee08979184ec"
 
     def __init__ ( self ):
         log("__init__ started v" + __addonversion__)
@@ -98,10 +98,14 @@ class MyPlayer( xbmc.Player ) :
             Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(str(mbid))
         else:
             Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote(currentlyPlayingArtist)
-        WebSock = urllib.request.urlopen(Base_URL)
         log("Request : " + Base_URL)
-        WebHTML = WebSock.read().decode('utf-8')
-        WebSock.close()
+        try:
+            WebSock = urllib.request.urlopen(Base_URL, timeout=10)
+            WebHTML = WebSock.read().decode('utf-8')
+            WebSock.close()
+        except Exception as e:
+            log("fetch_similarArtists failed: " + str(e))
+            return []
 
         similarArtists = re.findall("<artist>.*?<name>(.+?)</name>.*?<mbid>(.*?)</mbid>.*?<match>(.+?)</match>.*?</artist>", WebHTML, re.DOTALL )
         similarArtists = [x for x in similarArtists if float(x[2]) > (float(self.minimalmatching)/100.0)]
@@ -121,10 +125,14 @@ class MyPlayer( xbmc.Player ) :
         apiMethod = "&method=artist.gettoptracks&limit=20"
 
         Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(mbIdArtist)
-        WebSock = urllib.request.urlopen(Base_URL)
         log("Request : " + Base_URL)
-        WebHTML2 = WebSock.read().decode('utf-8')
-        WebSock.close()
+        try:
+            WebSock = urllib.request.urlopen(Base_URL, timeout=10)
+            WebHTML2 = WebSock.read().decode('utf-8')
+            WebSock.close()
+        except Exception as e:
+            log("fetch_topTracksOfArtist failed: " + str(e))
+            return []
         topTracks = re.findall("<track rank=.+?>.*?<name>(.+?)</name>.*?<playcount>(.+?)</playcount>.*?<listeners>(.+?)</listeners>.*?<artist>.*?<name>(.+?)</name>.*?</artist>.*?</track>", WebHTML2, re.DOTALL )
         log("Count: " + str(len(topTracks)))
         topTracks = [x for x in topTracks if int(x[1]) > self.minimalplaycount]
@@ -138,10 +146,14 @@ class MyPlayer( xbmc.Player ) :
             Base_URL = self.apiPath + apiMethod + "&mbid=" + urllib.parse.quote_plus(mbid)
         else:
             Base_URL = self.apiPath + apiMethod + "&artist=" + urllib.parse.quote(currentlyPlayingArtist) + "&track=" + urllib.parse.quote(currentlyPlayingTitle)
-        WebSock = urllib.request.urlopen(Base_URL)
         log("Request : " + Base_URL)
-        WebHTML = WebSock.read().decode('utf-8')
-        WebSock.close()
+        try:
+            WebSock = urllib.request.urlopen(Base_URL, timeout=10)
+            WebHTML = WebSock.read().decode('utf-8')
+            WebSock.close()
+        except Exception as e:
+            log("fetch_similarTracks failed: " + str(e))
+            return []
 
         similarTracks = re.findall("<track>.*?<name>(.+?)</name>.*?<playcount>(.+?)</playcount>.*?<match>(.+?)</match>.*?<artist>.*?<name>(.+?)</name>.*?</artist>.*?</track>", WebHTML, re.DOTALL )
         similarTracks = [x for x in similarTracks if int(x[1]) > self.minimalplaycount]
@@ -264,23 +276,23 @@ class MyPlayer( xbmc.Player ) :
                     thumb = item["thumbnail"]
                     duration = int(item["duration"])
                     fanart = item["fanart"]
-                    genre = item["genre"]
+                    genre = item["genre"][0] if item["genre"] else ""
                     year = int(item["year"])
                     if(artist not in selectedArtist):
                         selectedArtist.append(artist)
                         log("Found: " + str(trackTitle) + " by: " + str(artist))
                         if (self.allowtrackrepeat == "true" or (trackPath not in self.addedTracks)):
-                            if (self.preferdifferentartist != "true" or similarArtistName not in foundArtists):
+                            if (self.preferdifferentartist != "true" or artist not in foundArtists):
                                 listitem = self.getListItem(trackTitle,artist,album,thumb,fanart,duration,year,genre)
                                 xbmc.PlayList(0).add(url=trackPath, listitem=listitem)
                                 log("Add track : " + str(trackTitle) + " by: " + str(artist))
                                 self.addedTracks += [trackPath]
                                 xbmc.executebuiltin("Container.Refresh")
                                 self.countFoundTracks += 1
-                                if (similarArtistName not in foundArtists):
-                                    foundArtists += [similarArtistName]
+                                if (artist not in foundArtists):
+                                    foundArtists += [artist]
                             else:
-                                log("Skipping - artist already added: " + similarArtistName)
+                                log("Skipping - artist already added: " + str(artist))
                         else:
                             log("Skipping - repeat track: " + str(trackTitle))
                     else:
@@ -318,9 +330,9 @@ def addauto(newentry, scriptcode):
         lines.append("time.sleep(2)" + "#" + scriptcode + "\n")
         lines.append(newentry + "#" + scriptcode + "\n")
         with open(autoexecfile, "w") as f:
-            if not "import xbmc\n" in lines:
+            if not any(line.startswith("import xbmc") for line in lines):
                 f.write("import xbmc" + "#" + scriptcode + "\n")
-            if not "import os\n" in lines:
+            if not any(line.startswith("import os") for line in lines):
                 f.write("import os" + "#" + scriptcode + "\n")
             f.writelines(lines)
     else:

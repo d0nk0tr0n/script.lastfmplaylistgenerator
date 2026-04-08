@@ -8,6 +8,15 @@
 - Fixed: urllib.parse.quote used instead of quote_plus for artist/track
     names, preserving literal + in names like Florence + The Machine
 - Fixed: getMusicBrainzArtistID() returns a list - take first element
+- Fixed: genre returned as list from JSON-RPC - take first element to match
+    string expected by setInfo
+- Fixed: preferdifferentartist artist dedup now uses library artist name
+    consistently (was comparing Last.fm name against library name)
+- Fixed: addauto import guard uses startswith check to handle tagged and
+    commented import variants
+- Fixed: Last.fm API calls now use HTTPS instead of HTTP
+- Fixed: Last.fm API calls now have a 10-second timeout and catch network
+    errors gracefully instead of crashing the addon thread
 - Changed: top tracks of similar artist sorted by listeners after
     playcount filter
 
